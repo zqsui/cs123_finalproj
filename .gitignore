@@ -1,0 +1,4 @@
+*.o
+moc*
+3DTransformations_lab
+
