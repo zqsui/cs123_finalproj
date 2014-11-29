@@ -28,6 +28,7 @@ public:
     void updateCamera();
     void rotateCamera(float deltaX, float deltaY);
     void setLabel(QLabel* label);
+    void setLabel_test(QLabel* label);
 
 protected:
     void initializeGL();
@@ -89,8 +90,10 @@ private:
     float m_firedAngleX, m_firedAngleY;
     float m_firedXDiff, m_firedZDiff;
     float m_xDiff, m_zDiff;
+    float m_ballHeight, m_arenaSize;
     int m_score;
     QLabel * m_scoreLabel;
+    QLabel * m_testLabel;
     bool m_canCollide;
     int m_n_all;
 

@@ -15,8 +15,9 @@ GLWidget::GLWidget(QWidget *parent)
 {
 
     // Set up the camera
-    m_camera.eye.x = 0.0f, m_camera.eye.y = 0.0f, m_camera.eye.z = -1.0f;
-    m_camera.center.x = 0.0f, m_camera.center.y = 0.0f, m_camera.center.z = 0.0f;
+    m_ballHeight = 2.0f; m_arenaSize = 5.0f;
+    m_camera.eye.x = 0.0f, m_camera.eye.y = -m_arenaSize + m_ballHeight, m_camera.eye.z = 3.0f;
+    m_camera.center.x = 0.0f, m_camera.center.y = -m_arenaSize + m_ballHeight, m_camera.center.z = 0.0f;
     m_camera.up.x = 0.0f, m_camera.up.y = 1.0f, m_camera.up.z = 0.0f;
     m_camera.fovy = 45.0f, m_camera.near = 0.95f, m_camera.far = 1000.0f;
 
@@ -145,9 +146,9 @@ void GLWidget::renderTarget()
     //setTargetPosition(glm::vec3(0, 0, 0));
     //targetModelMat = glm::translate(m_targetPos, glm::vec3(0, 0, 3));
     //targetModelMat =
-    targetModelMat =glm::translate(glm::mat4(1.0), glm::vec3(0, 0, 3.0));
+    targetModelMat =glm::translate(glm::mat4(1.0), glm::vec3(0, 1, 3.0));
     m_shader.setUniform( "M_Matrix", Shader::MAT4, &targetModelMat[ 0 ][ 0 ]);
-    setTargetPosition(glm::vec3(0, 0, 3.0));
+    setTargetPosition(glm::vec3(0, 1, 3.0));
     //targetModelMat = glm::translate(targetModelMat, glm::vec3(0, 0, 3));
 
     glBindVertexArray(m_vaoID);
@@ -261,13 +262,15 @@ void GLWidget::paintGL()
         m_firedZDiff = m_zDiff;
     }
 
+
+
     // Clear the color and depth buffers to the current glClearColor
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
-    renderTarget();
+//    renderTarget();
 
-    renderBow();
+//    renderBow();
 
     renderArrow();
 
@@ -299,7 +302,11 @@ void GLWidget::renderArrow()
 
     // Start arrow off at fired position i.e. camera position when the arrow was fired or current
     // camera position if it hasn't been fired.
-    m_arrowPos =  glm::vec3( -m_firedXDiff, 0.0f, -m_firedZDiff );
+    m_arrowPos =  glm::vec3( -m_firedXDiff, -m_arenaSize + m_ballHeight, -m_firedZDiff );
+    // m_arrowPos =  glm::vec3( 0.0f, -3.0f, 0.0f );
+//    std::cout << m_firedXDiff << ' ' << -m_arenaSize + m_ballHeight << ' ' << m_firedZDiff << std::endl;
+
+
     // Set the velocity to reflect the rotation transforms we do to render the arrow.
     // We keep variables for all the values we need for this to simplify the velocity vector.
     double cx = cos( -m_firedAngleX * M_PI / 180.0f );
@@ -324,54 +331,58 @@ void GLWidget::renderArrow()
             && m_timer.isActive())
     {
         m_scoreLabel->setText("Score: " + QString::number(++m_score));
+//        m_testLabel->setText("chouchou");
         m_timer.stop();
     }
 
     // Transform to get to camera coordinates to render the arrow.
     glm::mat4 arrowModelMat0 = glm::mat4( 1.0f );
 
+    //arrowModelMat0 = glm::translate( arrowModelMat0, m_arrowPos );
+    //
+    //arrowModelMat0 = glm::scale( arrowModelMat0, glm::vec3( 0.075f ) );
+    arrowModelMat0 = glm::rotate( arrowModelMat0, m_firedAngleX, glm::vec3( 0.0f, 1.0f, 0.0f ) );
+    arrowModelMat0 = glm::rotate( arrowModelMat0, m_firedAngleY, glm::vec3( cmx, 0.0f, smx ) );
     arrowModelMat0 = glm::translate( arrowModelMat0, m_arrowPos );
-    arrowModelMat0 = glm::rotate( arrowModelMat0,  m_firedAngleY, glm::vec3( cmx, 0.0f, smx ) );
-    arrowModelMat0 = glm::rotate( arrowModelMat0, -m_firedAngleX, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-    arrowModelMat0 = glm::translate( arrowModelMat0, glm::vec3( -0.5f, 0.0f, 1.0f ) );
+    //arrowModelMat0 = glm::translate( arrowModelMat0, glm::vec3( -0.5f, 0.0f, 1.0f ) );
 
-    if(!m_fired)
-    {
-        arrowModelMat0 = glm::rotate( arrowModelMat0, 30.0f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-    }
+//    if(!m_fired)
+//    {
+//        arrowModelMat0 = glm::rotate( arrowModelMat0, 0.0f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
+//    }
     // Move and rotate to make the arrow face straight.
-    else
-    {
-        arrowModelMat0 = glm::translate(arrowModelMat0,
-                glm::vec3( qMin( 0.5f * time, 0.5f ), 0.0f, qMax( -0.7f, -1.0f * time) ) );
-        arrowModelMat0 = glm::rotate( arrowModelMat0,
-                qMax( 15.0f - ( time * 30 ), 0.5f ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
-    }
+//    else
+//    {
+//        arrowModelMat0 = glm::translate(arrowModelMat0,
+//                glm::vec3( qMin( 0.5f * time, 0.5f ), 0.0f, qMax( -0.7f, -1.0f * time) ) );
+//        arrowModelMat0 = glm::rotate( arrowModelMat0,
+//                qMax( 15.0f - ( time * 30 ), 0.5f ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+//    }
 
     glm::mat4 arrowModelMat1 = arrowModelMat0;
 
     // Arrowhead
     glm::vec3 Ka = glm::vec3( 0.0f );
     m_shader.setUniform( "Ka", Shader::VEC3, &Ka );
-    arrowModelMat1 = glm::scale( arrowModelMat0, glm::vec3( 0.075f ) );
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &arrowModelMat1[ 0 ][ 0 ] );
+
+    m_shader.setUniform( "M_Matrix", Shader::MAT4, &arrowModelMat0[ 0 ][ 0 ] );
     m_sphere->draw();
 
-    // Shaft
-    Ka = glm::vec3( 0.37f, 0.15f, 0.02f );
-    m_shader.setUniform( "Ka", Shader::VEC3, &Ka );
-    arrowModelMat1 = glm::translate( arrowModelMat0, glm::vec3( 0.0f, 0.0f, -0.48f ) );
-    arrowModelMat1 = glm::scale( arrowModelMat1, glm::vec3( 0.075f, 0.075f, 0.48f ) );
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &arrowModelMat1[ 0 ][ 0 ] );
-    m_sphere->draw();
+//    // Shaft
+//    Ka = glm::vec3( 0.37f, 0.15f, 0.02f );
+//    m_shader.setUniform( "Ka", Shader::VEC3, &Ka );
+//    arrowModelMat1 = glm::translate( arrowModelMat0, glm::vec3( 0.0f, 0.0f, -0.48f ) );
+//    arrowModelMat1 = glm::scale( arrowModelMat1, glm::vec3( 0.075f, 0.075f, 0.48f ) );
+//    m_shader.setUniform( "M_Matrix", Shader::MAT4, &arrowModelMat1[ 0 ][ 0 ] );
+//    m_sphere->draw();
 
-    // Back bit
-    Ka = glm::vec3( 0.0f, 0.7f, 0.0f );
-    m_shader.setUniform( "Ka", Shader::VEC3, &Ka );
-    arrowModelMat1 = glm::translate( arrowModelMat0, glm::vec3( 0.0f, 0.0f, -0.96f ) );
-    arrowModelMat1 = glm::scale( arrowModelMat1, glm::vec3( 0.075f ) );
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &arrowModelMat1[0][0] );
-    m_sphere->draw();
+//    // Back bit
+//    Ka = glm::vec3( 0.0f, 0.7f, 0.0f );
+//    m_shader.setUniform( "Ka", Shader::VEC3, &Ka );
+//    arrowModelMat1 = glm::translate( arrowModelMat0, glm::vec3( 0.0f, 0.0f, -0.96f ) );
+//    arrowModelMat1 = glm::scale( arrowModelMat1, glm::vec3( 0.075f ) );
+//    m_shader.setUniform( "M_Matrix", Shader::MAT4, &arrowModelMat1[0][0] );
+//    m_sphere->draw();
 }
 
 
@@ -428,7 +439,7 @@ void GLWidget::renderRoom()
     glm::vec3 Ka = glm::vec3( 0.0f, 0.7f, 0.93f);
     m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
 
-    // Ceiling
+//    // Ceiling
     glm::mat4 modelMat = glm::mat4(1.0f);
     modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 5.0f, 0.0f ) );
     modelMat = glm::scale( modelMat, glm::vec3( 5.0f ) );
@@ -436,22 +447,15 @@ void GLWidget::renderRoom()
     m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0] );
     m_quad->draw();
 
-    // Back
+//    // Back
     modelMat = glm::mat4(1.0f);
-    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 0.0f, -5.0f ) );
+    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 0.0f, 5.0f ) );
     modelMat = glm::scale( modelMat, glm::vec3( 5.0f ) );
+    modelMat = glm::rotate(modelMat, 180.0f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
     m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0] );
     m_quad->draw();
 
-    // Right
-    modelMat = glm::mat4(1.0f);
-    modelMat = glm::translate( modelMat, glm::vec3( -5.0f, 0.0f, 0.0f ) );
-    modelMat = glm::scale( modelMat, glm::vec3( 5.0f ) );
-    modelMat = glm::rotate(modelMat, 90.0f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
-    m_quad->draw();
-
-    // Left
+//    // Right
     modelMat = glm::mat4(1.0f);
     modelMat = glm::translate( modelMat, glm::vec3( 5.0f, 0.0f, 0.0f ) );
     modelMat = glm::scale( modelMat, glm::vec3( 5.0f ) );
@@ -459,21 +463,28 @@ void GLWidget::renderRoom()
     m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
     m_quad->draw();
 
-    // Front
-    Ka = glm::vec3(0.9f, 0.74f, 0.2f);
-    m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
+//    // Left
     modelMat = glm::mat4(1.0f);
-    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 0.0f, 5.0f ) );
+    modelMat = glm::translate( modelMat, glm::vec3( -5.0f, 0.0f, 0.0f ) );
     modelMat = glm::scale( modelMat, glm::vec3( 5.0f ) );
-    modelMat = glm::rotate(modelMat, 180.0f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
+    modelMat = glm::rotate(modelMat, 90.0f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
     m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
     m_quad->draw();
 
-    // Ground
+//    // Front
+    Ka = glm::vec3(0.9f, 0.74f, 0.2f);
+    m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
+    modelMat = glm::mat4(1.0f);
+    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 0.0f, -5.0f ) );
+    modelMat = glm::scale( modelMat, glm::vec3( 5.0f ) );
+    m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
+    m_quad->draw();
+
+//    // Ground
     Ka = glm::vec3(0.3f, 0.74f, 0.2f);
     m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
     modelMat = glm::mat4(1.0f);
-    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, -1.0f, 0.0f ) );
+    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, -5.0f, 0.0f ) );
     modelMat = glm::scale( modelMat, glm::vec3( 5.0f ) );
     modelMat = glm::rotate(modelMat, -90.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
     m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
@@ -508,8 +519,12 @@ void GLWidget::updateCamera()
 
     m_viewMatrix = glm::lookAt( m_camera.eye,  m_camera.center, m_camera.up );
     m_viewMatrix = glm::rotate( m_viewMatrix,  m_angleX, glm::vec3( 0.0f, 1.0f, 0.0f) );
-    m_viewMatrix = glm::rotate( m_viewMatrix, -m_angleY, glm::vec3( cos(M_PI*m_angleX/180), 0.0f, sin(M_PI*m_angleX/180) ) );
+//    std::cout<<m_angleY<<std::endl;
+    m_viewMatrix = glm::rotate( m_viewMatrix, m_angleY, glm::vec3( cos(M_PI*m_angleX/180), 0.0f, sin(M_PI*m_angleX/180) ) );
+
     m_viewMatrix = glm::translate( m_viewMatrix, glm::vec3( m_xDiff, 0.0f, m_zDiff) );
+
+//    std::cout << m_xDiff << ' ' << m_zDiff << std::endl;
 
     m_shader.setUniform( "V_Matrix", Shader::MAT4, &m_viewMatrix[0][0] );
 }
@@ -521,33 +536,33 @@ void GLWidget::updateCamera()
 void GLWidget::keyPressEvent ( QKeyEvent * event )
 {
     //we adjust how we move by what angle we're currently facing
-    double cx = cos(-m_angleX * M_PI/180);
-    double sx = sin(-m_angleX * M_PI/180);
+    double cx = cos(m_angleX * M_PI/180);
+    double sx = sin(m_angleX * M_PI/180);
     if(event->key() == Qt::Key_W)
     {
-        m_zDiff -= 0.025f * cx;
-        m_xDiff -= 0.025f * sx;
+        m_zDiff += 0.25f * cx;
+        m_xDiff -= 0.25f * sx;
         this->updateCamera();
         this->update();
     }
     else if(event->key() == Qt::Key_S)
     {
-        m_zDiff += 0.025f * cx;
-        m_xDiff += 0.025f * sx;
+        m_zDiff -= 0.25f * cx;
+        m_xDiff += 0.25f * sx;
         this->updateCamera();
         this->update();
     }
     else if(event->key() == Qt::Key_D)
     {
-        m_zDiff += 0.025f * -sx;
-        m_xDiff += 0.025f * cx;
+        m_zDiff -= 0.25f * sx;
+        m_xDiff -= 0.25f * cx;
         this->updateCamera();
         this->update();
     }
     else if(event->key() == Qt::Key_A)
     {
-        m_zDiff -= 0.025f * -sx;
-        m_xDiff -= 0.025f * cx;
+        m_zDiff += 0.25f * sx;
+        m_xDiff += 0.25f * cx;
         this->updateCamera();
         this->update();
     }
@@ -628,6 +643,7 @@ void GLWidget::rotateCamera(float deltaX, float deltaY)
     m_angleX +=  deltaX * 0.025;
     m_angleY +=  deltaY * 0.025;
     m_angleY = qMax(-90 + 0.001, qMin(90 - 0.001, (double)m_angleY));
+//    std::cout<<m_angleX<<" "<<m_angleY<<std::endl;
     updateCamera();
 }
 
@@ -649,6 +665,10 @@ void GLWidget::setLabel(QLabel* label)
 {
     m_scoreLabel = label;
 }
+void GLWidget::setLabel_test(QLabel* label)
+{
+    m_testLabel = label;
+}
 
 
 /**
@@ -669,11 +689,12 @@ void GLWidget::tick()
 {
     m_increment++;
     update();
-    if(m_increment/(float) m_fps > 1.0f)
+    if(m_increment > m_fps )
     {
         //reset the timer and set fired to false
         m_timer.stop();
         m_increment = 0.0f;
         m_fired = false;
     }
+//    std::cout<<m_increment<<std::endl;
 }
