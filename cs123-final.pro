@@ -1,6 +1,6 @@
 QT += core gui opengl
 
-TARGET = 3DTransformations_lab
+TARGET = cs123-final
 TEMPLATE = app
 
 INCLUDEPATH += src

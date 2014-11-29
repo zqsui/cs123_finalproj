@@ -227,8 +227,8 @@ void GLWidget::initializeGL()
     glFrontFace(GL_CCW);
 
     // Load the initial settings.
-    m_shader.loadVertexShader( "ADS/ADS.vert" );
-    m_shader.loadFragmentShader( "ADS/ADS.frag" );
+    m_shader.loadVertexShader( "../cs123_finalproj/ADS/ADS.vert" );
+    m_shader.loadFragmentShader( "../cs123_finalproj/ADS/ADS.frag" );
     m_shader.compile();
     m_shader.use();
 
