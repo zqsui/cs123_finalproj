@@ -16,7 +16,9 @@ SOURCES += \
     src/Settings.cpp \
     src/Shader.cpp \
     src/Sphere.cpp \
-    src/glwidget.cpp
+    src/glwidget.cpp \
+    src/CamtransCamera.cpp \
+    src/utils.cpp
 
 HEADERS += \
     src/mainwindow.h \
@@ -26,7 +28,9 @@ HEADERS += \
     src/Shader.h \
     src/Sphere.h \
     src/Camera.h \
-    src/glwidget.h
+    src/glwidget.h \
+    src/CamtransCamera.h \
+    src/utils.h
 
 FORMS += src/mainwindow.ui
 

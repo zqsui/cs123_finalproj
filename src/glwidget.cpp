@@ -8,18 +8,33 @@
 #include "glm/glm/gtc/matrix_transform.hpp"
 #include "glm/glm/gtx/string_cast.hpp"
 
+
+
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent), m_timer(this), m_fps(60.0f), m_increment(0), m_angleX(0.0f),
       m_angleY(0.0f), m_xDiff(0.0f), m_zDiff(0.0f), m_arrowRadius(0.1), m_targetRadius(0.5),
       m_score(0), m_canCollide(false)
 {
 
-    // Set up the camera
-    m_ballHeight = 2.0f; m_arenaSize = 5.0f;
-    m_camera.eye.x = 0.0f, m_camera.eye.y = -m_arenaSize + m_ballHeight, m_camera.eye.z = 3.0f;
-    m_camera.center.x = 0.0f, m_camera.center.y = -m_arenaSize + m_ballHeight, m_camera.center.z = 0.0f;
-    m_camera.up.x = 0.0f, m_camera.up.y = 1.0f, m_camera.up.z = 0.0f;
-    m_camera.fovy = 45.0f, m_camera.near = 0.95f, m_camera.far = 1000.0f;
+    // Set up the camera    
+//    m_camera.eye.x = 0.0f, m_camera.eye.y = -m_arenaSize + m_ballHeight, m_camera.eye.z = 3.0f;
+//    m_camera.center.x = 0.0f, m_camera.center.y = -m_arenaSize + m_ballHeight, m_camera.center.z = 0.0f;
+//    m_camera.up.x = 0.0f, m_camera.up.y = 1.0f, m_camera.up.z = 0.0f;
+//    m_camera.fovy = 45.0f, m_camera.near = 0.95f, m_camera.far = 1000.0f;
+
+    m_camera.setClip(0.95f, 1000.0f);
+    m_camera.setAspectRatio(1.0);
+    m_camera.setHeightAngle(45.0);
+
+//    const glm::vec4 eye = glm::vec4(0.0, -m_arenaSize + m_ballHeight, 3.0, 1.0);
+//    const glm::vec4 look = glm::vec4(0.0, 0.0, -1.0, 0.0);
+//    const glm::vec4 up = glm::vec4(0.0, 1.0, 0.0, 0.0);
+    m_camera.orientLook(eye, look, up);
+
+    arrow_vel = glm::vec3(0.0);
+
+
+
 
     // Set up 60 FPS draw loop
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(tick()));
@@ -28,7 +43,7 @@ GLWidget::GLWidget(QWidget *parent)
     m_originalMouseX = -1;
     m_originalMouseY = -1;
 
-    m_arrowPos = glm::vec3(0,0,0);
+    m_arrowPos = glm::vec3(0,-3.0f,0);
     m_targetPos = m_arrowPos;
 }
 
@@ -302,9 +317,10 @@ void GLWidget::renderArrow()
 
     // Start arrow off at fired position i.e. camera position when the arrow was fired or current
     // camera position if it hasn't been fired.
-    m_arrowPos =  glm::vec3( -m_firedXDiff, -m_arenaSize + m_ballHeight, -m_firedZDiff );
+    m_arrowPos =  glm::vec3( -m_firedXDiff, 2, -m_firedZDiff );
     // m_arrowPos =  glm::vec3( 0.0f, -3.0f, 0.0f );
 //    std::cout << m_firedXDiff << ' ' << -m_arenaSize + m_ballHeight << ' ' << m_firedZDiff << std::endl;
+
 
 
     // Set the velocity to reflect the rotation transforms we do to render the arrow.
@@ -318,13 +334,64 @@ void GLWidget::renderArrow()
     double cmx = cos( M_PI * m_firedAngleX / 180.0f );
     double smx = sin( M_PI * m_firedAngleX / 180.0f );
 
-    // Calculates through the rotates done to get an accurate velocity vector.
-    glm::vec3 vel = glm::vec3( ( ( sx * ( ( cmx * cmx * omcy ) + cy ) ) + ( cx * cmx * smx * omcy ) ),
-                               ( ( sx * smx * sy) - ( cx * cmx * sy ) ),
-                               ( ( sx * cmx * smx * omcy) + ( cx * ( ( smx * smx * omcy ) + cy ) ) ) );
 
-    // Move the arrow's position based on velocity and time.
-    m_arrowPos += time * vel;
+
+    //arrowModelMat0 = glm::translate( arrowModelMat0, m_arrowPos );
+    //
+//    arrowModelMat0 = glm::scale( arrowModelMat0, glm::vec3( 0.075f ) );
+//    arrowModelMat0 = glm::translate( arrowModelMat0, m_arrowPos );
+//    arrowModelMat0 = glm::rotate( arrowModelMat0, m_firedAngleY, glm::vec3( cmx, 0.0f, smx ) );
+//    arrowModelMat0 = glm::rotate( arrowModelMat0, -m_firedAngleX, glm::vec3( 0.0f, 1.0f, 0.0f ) );
+
+
+    //arrowModelMat0 = glm::translate( arrowModelMat0, glm::vec3( -0.5f, 0.0f, 1.0f ) );
+
+
+//    const glm::vec4 eye = glm::vec4(0.0, -m_arenaSize + m_ballHeight, 3.0, 1.0);
+//    const glm::vec4 look = glm::vec4(0.0, 0.0, -1.0, 0.0);
+//    const glm::vec4 up = glm::vec4(0.0, 1.0, 0.0, 0.0);
+//    m_camera.orientLook(eye, look, up);
+
+//    m_camera.rotateV(-m_angleX);
+//    m_camera.rotateU(-m_angleY);
+//    m_camera.translate(glm::vec4(-m_xDiff, 0.0f, -m_zDiff, 1.0f));
+
+
+    //arrowModelMat0 = m_camera.getRotation(eye, up, m_camera.degree2Radians((m_firedAngleX)));
+    //glm::vec4 new_eye = eye + glm::vec4()
+    //arrowModelMat0 = glm::translate(arrowModelMat0, glm::vec3(-m_firedXDiff, 0.0, -m_firedZDiff));
+    // Transform to get to camera coordinates to render the arrow.
+    glm::mat4 arrowModelMat0 = glm::mat4( 1.0f );
+
+
+    arrowModelMat0 = glm::translate(arrowModelMat0, m_arrowPos);
+    glm::vec4 new_eye = eye + glm::vec4(-m_firedXDiff, 0.0, -m_firedZDiff, 0.0);
+    glm::mat4 rotateX = m_camera.getRotation(new_eye, up, m_camera.degree2Radians(-m_firedAngleX));
+    arrowModelMat0 =  rotateX * arrowModelMat0;
+    glm::vec4 r_axis = rotateX * glm::vec4(1.0, 0.0, 0.0, 0.0);
+    arrowModelMat0 = m_camera.getRotation(new_eye, r_axis, m_camera.degree2Radians(-m_firedAngleY)) * arrowModelMat0;
+    arrowModelMat0 = arrowModelMat0 * m_camera.getScale(glm::vec4(0.075));
+
+    glm::vec4 new_pos = arrowModelMat0 * glm::vec4(0.0, 0.0, 0.0, 1.0);
+
+    m_arrowPos = glm::vec3(new_pos);
+
+    if ( !m_fired )
+        arrow_vel = glm::normalize(glm::transpose(glm::inverse(glm::mat3x3(arrowModelMat0))) *
+            glm::vec3(0.0, 0.0, -1));
+    else
+    {
+//        m_arrowPos += time * arrow_vel;
+        //m_arrowPos += 1 * arrow_vel;
+        //std::cout << arrow_vel.x << ' ' << arrow_vel.y << ' ' << arrow_vel.z << std::endl;
+        //arrowModelMat0 = glm::translate(arrowModelMat0, time * arrow_vel);
+        glm::vec3 cur_pos = glm::vec3(new_pos) + arrow_vel * time;
+        arrowModelMat0 = glm::translate(glm::mat4(1.0f), cur_pos);
+        arrowModelMat0 = glm::scale(arrowModelMat0, glm::vec3(0.075));
+//        arrowModelMat0 = glm::translate(glm::mat4(1.0f), m_arrowPos);
+    }
+
+
 
     // Look for a hit, and if we find one, stop the arrow.
     if(m_canCollide && ( (float )glm::length( ( m_arrowPos - m_targetPos ) ) < m_arrowRadius + m_targetRadius )
@@ -335,16 +402,17 @@ void GLWidget::renderArrow()
         m_timer.stop();
     }
 
-    // Transform to get to camera coordinates to render the arrow.
-    glm::mat4 arrowModelMat0 = glm::mat4( 1.0f );
+    //if ( m_fired )
+      //  arrowModelMat0 = glm::translate(arrowModelMat0, m_arrowPos);
 
-    //arrowModelMat0 = glm::translate( arrowModelMat0, m_arrowPos );
-    //
-    //arrowModelMat0 = glm::scale( arrowModelMat0, glm::vec3( 0.075f ) );
-    arrowModelMat0 = glm::rotate( arrowModelMat0, m_firedAngleX, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-    arrowModelMat0 = glm::rotate( arrowModelMat0, m_firedAngleY, glm::vec3( cmx, 0.0f, smx ) );
-    arrowModelMat0 = glm::translate( arrowModelMat0, m_arrowPos );
-    //arrowModelMat0 = glm::translate( arrowModelMat0, glm::vec3( -0.5f, 0.0f, 1.0f ) );
+//    printMatrix(arrowModelMat0);
+    //arrowModelMat0 = glm::scale(arrowModelMat0, glm::vec3(0.3));
+//    printMatrix(glm::scale(glm::mat4x4(1.0), glm::vec3(0.075)));
+//    std::cout<<"-------"<<std::endl;
+
+    //std::cout << m_camera.degree2Radians((m_firedAngleX)) << std::endl;
+   // printMatrix(arrowModelMat0);
+//    arrowModelMat0 = m_camera.getRotation(3, up, -m_angleX);
 
 //    if(!m_fired)
 //    {
@@ -362,9 +430,9 @@ void GLWidget::renderArrow()
     glm::mat4 arrowModelMat1 = arrowModelMat0;
 
     // Arrowhead
-    glm::vec3 Ka = glm::vec3( 0.0f );
+    glm::vec3 Ka = glm::vec3( 1.0f, 0.0f, 0.0f );
     m_shader.setUniform( "Ka", Shader::VEC3, &Ka );
-
+    //arrowModelMat0 = glm::scale( arrowModelMat0, glm::vec3( 0.075f) );
     m_shader.setUniform( "M_Matrix", Shader::MAT4, &arrowModelMat0[ 0 ][ 0 ] );
     m_sphere->draw();
 
@@ -484,7 +552,7 @@ void GLWidget::renderRoom()
     Ka = glm::vec3(0.3f, 0.74f, 0.2f);
     m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
     modelMat = glm::mat4(1.0f);
-    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, -5.0f, 0.0f ) );
+    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 0.0f, 0.0f ) );
     modelMat = glm::scale( modelMat, glm::vec3( 5.0f ) );
     modelMat = glm::rotate(modelMat, -90.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
     m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
@@ -513,20 +581,36 @@ void GLWidget::updateCamera()
     float w = width();
     float h = height();
     float aspectRatio = 1.0f * w / h;
-    m_projectionMatrix = glm::mat4(1.0);
-    m_projectionMatrix = glm::perspective( m_camera.fovy, aspectRatio, m_camera.near, m_camera.far );
+//    m_projectionMatrix = glm::mat4(1.0);
+//    m_projectionMatrix = glm::perspective( m_camera.fovy, aspectRatio, m_camera.near, m_camera.far );
+
+    m_projectionMatrix = m_camera.getProjectionMatrix();
     m_shader.setUniform( "P_Matrix", Shader::MAT4, &m_projectionMatrix[0][0] );
 
-    m_viewMatrix = glm::lookAt( m_camera.eye,  m_camera.center, m_camera.up );
-    m_viewMatrix = glm::rotate( m_viewMatrix,  m_angleX, glm::vec3( 0.0f, 1.0f, 0.0f) );
-//    std::cout<<m_angleY<<std::endl;
-    m_viewMatrix = glm::rotate( m_viewMatrix, m_angleY, glm::vec3( cos(M_PI*m_angleX/180), 0.0f, sin(M_PI*m_angleX/180) ) );
+//    const glm::vec4 eye = glm::vec4(0.0, -m_arenaSize + m_ballHeight, 3.0, 1.0);
+//    const glm::vec4 look = glm::vec4(0.0, 0.0, -1.0, 0.0);
+//    const glm::vec4 up = glm::vec4(0.0, 1.0, 0.0, 0.0);
+    m_camera.orientLook(eye, look, up);
 
-    m_viewMatrix = glm::translate( m_viewMatrix, glm::vec3( m_xDiff, 0.0f, m_zDiff) );
+
+    m_camera.rotateV(-m_angleX);
+    m_camera.rotateU(-m_angleY);
+    m_camera.translate(glm::vec4(-m_xDiff, 0.0f, -m_zDiff, 1.0f));
+
+    m_viewMatrix = m_camera.getViewMatrix();
+
+//    m_viewMatrix = glm::lookAt( m_camera.eye,  m_camera.center, m_camera.up );
+//    m_viewMatrix = glm::rotate( m_viewMatrix,  m_angleX, glm::vec3( 0.0f, 1.0f, 0.0f) );
+////    std::cout<<m_angleY<<std::endl;
+    //m_viewMatrix = glm::rotate( m_viewMatrix, m_angleY, glm::vec3( cos(M_PI*m_angleX/180), 0.0f, sin(M_PI*m_angleX/180) ) );
+
+//    m_viewMatrix = glm::translate( m_viewMatrix, glm::vec3( m_xDiff, 0.0f, m_zDiff) );
 
 //    std::cout << m_xDiff << ' ' << m_zDiff << std::endl;
 
     m_shader.setUniform( "V_Matrix", Shader::MAT4, &m_viewMatrix[0][0] );
+
+//    std::cout << m_camera.center.x << ' ' << m_camera.center.y << ' ' << m_camera.center.z << std::endl;
 }
 
 

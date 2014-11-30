@@ -15,6 +15,7 @@
 #include "Camera.h"
 #include "Shader.h"
 #include "Sphere.h"
+#include "CamtransCamera.h"
 
 class GLWidget : public QGLWidget
 {
@@ -75,7 +76,7 @@ private:
     Quad* m_quad;
     Sphere* m_sphere;
 
-    LabCamera m_camera;
+    CamtransCamera m_camera;
     glm::mat4 m_projectionMatrix;
     glm::mat4 m_viewMatrix;
 
@@ -90,7 +91,7 @@ private:
     float m_firedAngleX, m_firedAngleY;
     float m_firedXDiff, m_firedZDiff;
     float m_xDiff, m_zDiff;
-    float m_ballHeight, m_arenaSize;
+
     int m_score;
     QLabel * m_scoreLabel;
     QLabel * m_testLabel;
@@ -99,6 +100,12 @@ private:
 
     GLuint m_vaoID;
     GLuint m_vboID;
+
+    glm::vec3 arrow_vel;
+
+    const glm::vec4 eye = glm::vec4(0.0, 2.0, 3.0, 1.0);
+    const glm::vec4 look = glm::vec4(0.0, 0.0, -1.0, 0.0);
+    const glm::vec4 up = glm::vec4(0.0, 1.0, 0.0, 0.0);
 };
 
 #endif // glwidget_H
