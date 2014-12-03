@@ -72,8 +72,17 @@ void printMatrix( glm::mat4 matrix)
 void GLWidget::initShapes()
 {
     m_quad = new Quad(m_shader);
-    m_sphere = new Sphere( m_shader.attrib("in_Position"), m_shader.attrib("in_Normal") );
-    initTarget();
+    m_sphere = new Sphere(30, 30, 1 ,
+                          m_shader.attrib("in_Position"),
+                          m_shader.attrib("in_Normal"),
+                          m_shader.attrib("texCoord") );
+    //initTarget();
+}
+void GLWidget::initBasketball()
+{
+    glm::vec3 pos = glm::vec3( -m_firedXDiff, 2, -m_firedZDiff );
+    Basketball b(pos, 1);
+    m_basketballList.push_back(b);
 }
 
 
@@ -261,6 +270,7 @@ void GLWidget::initializeGL()
     updateSettings();
     updateCamera();
     initShapes();
+    initBasketball();
 }
 
 
@@ -271,14 +281,11 @@ void GLWidget::paintGL()
 {
     // If we haven't fired yet, update the angles so that the arrow's angles and position to
     // match the camera's.
-    if(!m_fired)
-    {
-        m_firedAngleX = m_angleX;
-        m_firedAngleY = m_angleY;
-        m_firedXDiff = m_xDiff;
-        m_firedZDiff = m_zDiff;
-    }
 
+    m_firedAngleX = m_angleX;
+    m_firedAngleY = m_angleY;
+    m_firedXDiff = m_xDiff;
+    m_firedZDiff = m_zDiff;
 
 
     // Clear the color and depth buffers to the current glClearColor
@@ -289,24 +296,84 @@ void GLWidget::paintGL()
 
 //    renderBow();
 
-    renderArrow();
+//    renderArrow();
+    renderBasketball();
 
     renderRoom();
 
     //Render intersection spheres
-    if(m_canCollide && settings.showIntersectSpheres)
+//    if(m_canCollide && settings.showIntersectSpheres)
+//    {
+//        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+//        glm::vec3 Ka = glm::vec3( 0.5f );
+//        m_shader.setUniform( "Ka", Shader::VEC3, &Ka );
+//        renderTargetSphere();
+
+//        renderArrowSphere();
+
+//        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//    }
+}
+
+
+void GLWidget::renderBasketball()
+{
+//    std::cout<<m_basketballList.size()<<std::endl;
+
+
+    for(int i = 0; i<m_basketballList.size();i++)
     {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        float delta_t = 5.0f/(float)m_fps;
+        float scale = 0.3;
 
-        glm::vec3 Ka = glm::vec3( 0.5f );
+        glm::vec3 cur_pos = glm::vec3( -m_firedXDiff, 2, -m_firedZDiff );
+//        std::cout<<cur_pos.x<<" "<<cur_pos.y<<" "<<cur_pos.z<<std::endl;
+        glm::mat4 basketballModelMat0 = glm::mat4( 1.0f );
+        basketballModelMat0 = glm::translate(basketballModelMat0, cur_pos);
+        glm::vec4 new_eye = eye + glm::vec4(-m_firedXDiff, 0.0, -m_firedZDiff, 0.0);
+        glm::mat4 rotateX = m_camera.getRotation(new_eye, up,
+                                                 m_camera.degree2Radians(-m_firedAngleX));
+        basketballModelMat0 =  rotateX * basketballModelMat0;
+        glm::vec4 r_axis = rotateX * glm::vec4(1.0, 0.0, 0.0, 0.0);
+        basketballModelMat0 = m_camera.getRotation(new_eye, r_axis,
+                                                   m_camera.degree2Radians(-m_firedAngleY))
+                * basketballModelMat0;
+        basketballModelMat0 = basketballModelMat0 * m_camera.getScale(glm::vec4(scale));
+        glm::vec4 new_pos = basketballModelMat0 * glm::vec4(0.0, 0.0, 0.0, 1.0);
+        cur_pos = glm::vec3(new_pos);
+
+        Basketball cur_basketball = m_basketballList[i];
+
+        if (!cur_basketball.isFired())
+        {
+            glm::vec3 cur_vel = glm::normalize(glm::transpose(glm::inverse(glm::mat3x3(basketballModelMat0))) *
+                glm::vec3(0.0, 0.0, -1));
+            cur_basketball.updateVel(cur_vel);
+        }
+        else
+        {
+            cur_pos = cur_basketball.getPos() + cur_basketball.getVel() * delta_t;
+            basketballModelMat0 = glm::translate(glm::mat4(1.0f), cur_pos);
+            basketballModelMat0 = glm::scale(basketballModelMat0, glm::vec3(scale));
+        }
+        cur_basketball.updatePos(cur_pos);
+
+        m_basketballList[i] = cur_basketball;
+
+//        glm::vec3 tmp_pos = cur_basketball.getPos();
+//        std::cout<<tmp_pos.x<<" "<<tmp_pos.y<<" "<<tmp_pos.z<<std::endl;
+
+        glm::vec3 Ka = glm::vec3( 1.0f, 0.0f, 0.0f );
         m_shader.setUniform( "Ka", Shader::VEC3, &Ka );
-        renderTargetSphere();
+        //arrowModelMat0 = glm::scale( arrowModelMat0, glm::vec3( 0.075f) );
+        m_shader.setUniform( "M_Matrix", Shader::MAT4, &basketballModelMat0[ 0 ][ 0 ] );
+//        printMatrix(basketballModelMat0);
+        m_sphere->draw();
 
-        renderArrowSphere();
-
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 }
+
 
 
 /**
@@ -372,7 +439,7 @@ void GLWidget::renderArrow()
     arrowModelMat0 =  rotateX * arrowModelMat0;
     glm::vec4 r_axis = rotateX * glm::vec4(1.0, 0.0, 0.0, 0.0);
     arrowModelMat0 = m_camera.getRotation(new_eye, r_axis, m_camera.degree2Radians(-m_firedAngleY)) * arrowModelMat0;
-    arrowModelMat0 = arrowModelMat0 * m_camera.getScale(glm::vec4(0.075));
+    arrowModelMat0 = arrowModelMat0 * m_camera.getScale(glm::vec4(0.5));
 
     glm::vec4 new_pos = arrowModelMat0 * glm::vec4(0.0, 0.0, 0.0, 1.0);
 
@@ -389,7 +456,7 @@ void GLWidget::renderArrow()
         //arrowModelMat0 = glm::translate(arrowModelMat0, time * arrow_vel);
         glm::vec3 cur_pos = glm::vec3(new_pos) + arrow_vel * time;
         arrowModelMat0 = glm::translate(glm::mat4(1.0f), cur_pos);
-        arrowModelMat0 = glm::scale(arrowModelMat0, glm::vec3(0.075));
+        arrowModelMat0 = glm::scale(arrowModelMat0, glm::vec3(0.5));
 //        arrowModelMat0 = glm::translate(glm::mat4(1.0f), m_arrowPos);
     }
 
@@ -703,23 +770,28 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
         m_originalMouseX = event->globalX() - event->x() + this->width()/2;
         m_originalMouseY = event->globalY() - event->y() + this->height()/2;
         QCursor::setPos(m_originalMouseX, m_originalMouseY);
+        m_timer.start(1000.0f / m_fps);
     }
     else {
         m_originalMouseX = event->globalX();
         m_originalMouseY = event->globalY();
-        if(m_increment == 0.0f && !m_timer.isActive())
-        {
-            //start the timer if the increment is 0
-            m_timer.start(1000.0f / m_fps);
-            m_fired = true;
-        }
-        else
-        {
-            //reset the timer
-            m_increment = 0.0f;
-            m_fired = false;
-            m_timer.stop();
-        }
+//        if(m_increment == 0.0f && !m_timer.isActive())
+//        {
+//            //start the timer if the increment is 0
+//            m_timer.start(1000.0f / m_fps);
+//            m_fired = true;
+//        }
+//        else
+//        {
+//            //reset the timer
+//            m_increment = 0.0f;
+//            m_fired = false;
+//            m_timer.stop();
+//        }
+        Basketball cur_b = m_basketballList[m_basketballList.size() - 1];
+        cur_b.fireBasketball();
+        m_basketballList[m_basketballList.size() - 1] = cur_b;
+        initBasketball();
         update();
     }
 
@@ -778,14 +850,14 @@ void GLWidget::setTargetPosition(glm::vec3 pos)
  */
 void GLWidget::tick()
 {
-    m_increment++;
+//    m_increment++;
     update();
-    if(m_increment > m_fps )
-    {
-        //reset the timer and set fired to false
-        m_timer.stop();
-        m_increment = 0.0f;
-        m_fired = false;
-    }
+//    if(m_increment > m_fps )
+//    {
+//        //reset the timer and set fired to false
+//        m_timer.stop();
+//        m_increment = 0.0f;
+//        m_fired = false;
+//    }
 //    std::cout<<m_increment<<std::endl;
 }

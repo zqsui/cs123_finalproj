@@ -11,6 +11,6 @@ void main()
 {
     vec4 texColor = texture2D(textureSampler, uv);
 
-    FragColor = texColor;
-    //FragColor = vec4(LightIntensity, 1.0);
+    //FragColor = texColor;
+    FragColor = vec4(LightIntensity, 1.0);
 }

@@ -16,6 +16,10 @@
 #include "Shader.h"
 #include "Sphere.h"
 #include "CamtransCamera.h"
+#include "Basketball.h"
+#include "Shape.h"
+
+
 
 class GLWidget : public QGLWidget
 {
@@ -48,6 +52,8 @@ private:
     void initTarget();
     void initSphere();
 
+    void initBasketball();
+
     // Rendering methods.
     void renderArrowSphere();
     void renderTarget();
@@ -56,6 +62,11 @@ private:
     void renderArrow();
     void renderBow();
     void renderQuad();
+
+
+    void renderBasketball();
+
+
 
     void setTargetPosition(glm::vec3 pos);
     glm::vec3 getTargetPosition() { return m_targetPos; }
@@ -107,6 +118,10 @@ private:
     const glm::vec4 eye = glm::vec4(0.0, 2.0, 3.0, 1.0);
     const glm::vec4 look = glm::vec4(0.0, 0.0, -1.0, 0.0);
     const glm::vec4 up = glm::vec4(0.0, 1.0, 0.0, 0.0);
+
+
+    std::vector<Basketball> m_basketballList;
+
 };
 
 #endif // glwidget_H

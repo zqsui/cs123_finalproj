@@ -18,7 +18,9 @@ SOURCES += \
     src/Sphere.cpp \
     src/glwidget.cpp \
     src/CamtransCamera.cpp \
-    src/utils.cpp
+    src/utils.cpp \
+    src/Shape.cpp \
+    src/Basketball.cpp
 
 HEADERS += \
     src/mainwindow.h \
@@ -30,7 +32,9 @@ HEADERS += \
     src/Camera.h \
     src/glwidget.h \
     src/CamtransCamera.h \
-    src/utils.h
+    src/utils.h \
+    src/Shape.h \
+    src/Basketball.h
 
 FORMS += src/mainwindow.ui
 

@@ -50,7 +50,7 @@ Quad::Quad(Shader &shader)
    glEnableVertexAttribArray( shader.attrib( "in_Normal" ) );
    glVertexAttribPointer( shader.attrib( "in_Normal" ) ,3 , GL_FLOAT,GL_FALSE, stride, (void*) (3*sizeof(GLfloat)) );
    glEnableVertexAttribArray( shader.attrib( "texCoord" ) );
-   glVertexAttribPointer( shader.attrib( "texCoord" ) ,3 , GL_FLOAT,GL_FALSE, stride, (void*) (6*sizeof(GLfloat)) );
+   glVertexAttribPointer( shader.attrib( "texCoord" ) ,2 , GL_FLOAT,GL_FALSE, stride, (void*) (6*sizeof(GLfloat)) );
 
    //Unbind buffers
    glBindVertexArray( 0 );
