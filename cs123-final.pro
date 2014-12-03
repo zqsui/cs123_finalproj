@@ -34,7 +34,8 @@ HEADERS += \
     src/CamtransCamera.h \
     src/utils.h \
     src/Shape.h \
-    src/Basketball.h
+    src/Basketball.h \
+    src/Physics.h
 
 FORMS += src/mainwindow.ui
 

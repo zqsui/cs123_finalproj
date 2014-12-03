@@ -319,7 +319,7 @@ void GLWidget::renderBasketball()
 
     for(int i = 0; i<m_basketballList.size();i++)
     {
-        float delta_t = 5.0f/(float)m_fps;
+        float delta_t = 1.0f/(float)m_fps;
         float scale = 0.3;
 
         glm::vec3 cur_pos = glm::vec3( -m_firedXDiff, 2, -m_firedZDiff );
@@ -342,9 +342,10 @@ void GLWidget::renderBasketball()
 
         if (!cur_basketball->isFired())
         {
-            glm::vec3 cur_vel = glm::normalize(glm::transpose(glm::inverse(glm::mat3x3(basketballModelMat0))) *
-                glm::vec3(0.0, 0.0, -1));
+            glm::vec3 cur_vel = glm::transpose(glm::inverse(glm::mat3x3(basketballModelMat0))) *
+                glm::vec3(0.0, 0.0, -1);
             cur_basketball->updateVel(cur_vel);
+            std::cout<<glm::length(cur_vel)<<std::endl;
         }
         else
         {
@@ -369,6 +370,12 @@ void GLWidget::renderBasketball()
             m_sphere->draw();
     }
 }
+
+
+
+
+
+
 
 
 
