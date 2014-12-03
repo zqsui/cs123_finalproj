@@ -7,11 +7,12 @@
 
 #include <string>
 #include <vector>
+#include <QString>
 
 class Shader
 {
    public:
-      enum UNIFORM_TYPE { FLOAT, VEC3, VEC4, MAT3, MAT4 };
+      enum UNIFORM_TYPE { INT, FLOAT, VEC3, VEC4, MAT3, MAT4 };
 
       Shader();
       ~Shader();
@@ -26,6 +27,8 @@ class Shader
       void setUniform(const std::string uniformName, UNIFORM_TYPE type, void *t );
       GLuint uniformLocation( const std::string );
       void use();
+
+      GLuint loadTexture(const QString &path);
 
 
    private:

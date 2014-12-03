@@ -248,6 +248,8 @@ void GLWidget::initializeGL()
     m_shader.compile();
     m_shader.use();
 
+    m_textureId = m_shader.loadTexture("../cs123_finalproj/textures/particle3.jpg");
+
     // Set lighting properties.
     glm::vec3 La = glm::vec3( 0.2f, 0.2f, 0.2f );
     m_shader.setUniform( "La", Shader::VEC3, &La );
@@ -540,13 +542,18 @@ void GLWidget::renderRoom()
     m_quad->draw();
 
 //    // Front
+    glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
+    m_shader.setUniform("textureSampler", Shader::INT, 0);
+
     Ka = glm::vec3(0.9f, 0.74f, 0.2f);
     m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
     modelMat = glm::mat4(1.0f);
     modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 0.0f, -5.0f ) );
     modelMat = glm::scale( modelMat, glm::vec3( 5.0f ) );
     m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
+    glBindTexture(GL_TEXTURE_2D, m_textureId);
     m_quad->draw();
+    glBindTexture(GL_TEXTURE_2D, 0);
 
 //    // Ground
     Ka = glm::vec3(0.3f, 0.74f, 0.2f);

@@ -3,6 +3,11 @@
 layout (location = 0) in vec3 in_Position;
 layout (location = 1) in vec3 in_Normal;
 
+
+in vec2 texCoord; // UV texture coordinates of the vertex
+
+out vec2 uv; //UV texture coordinates of the vertex
+
 out vec3 LightIntensity;
 
 uniform vec3 La;		//Ambient light intensity
@@ -20,6 +25,8 @@ uniform mat4 P_Matrix;
 
 void main()
 {
+        uv = texCoord;
+
 	//Compute MVP_Matrix;
 	mat4 MV_Matrix = V_Matrix * M_Matrix;
 	mat3 N_Matrix = mat3( transpose( inverse( MV_Matrix ) ) );

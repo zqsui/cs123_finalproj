@@ -100,6 +100,7 @@ private:
 
     GLuint m_vaoID;
     GLuint m_vboID;
+    GLuint m_textureId;
 
     glm::vec3 arrow_vel;
 
