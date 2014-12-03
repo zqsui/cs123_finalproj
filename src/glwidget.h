@@ -120,7 +120,7 @@ private:
     const glm::vec4 up = glm::vec4(0.0, 1.0, 0.0, 0.0);
 
 
-    std::vector<Basketball> m_basketballList;
+    std::vector<Basketball *> m_basketballList;
 
 };
 

@@ -32,10 +32,6 @@ GLWidget::GLWidget(QWidget *parent)
     m_camera.orientLook(eye, look, up);
 
     arrow_vel = glm::vec3(0.0);
-
-
-
-
     // Set up 60 FPS draw loop
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(tick()));
 
@@ -81,8 +77,7 @@ void GLWidget::initShapes()
 void GLWidget::initBasketball()
 {
     glm::vec3 pos = glm::vec3( -m_firedXDiff, 2, -m_firedZDiff );
-    Basketball b(pos, 1);
-    m_basketballList.push_back(b);
+    m_basketballList.push_back(new Basketball(pos, 1));
 }
 
 
@@ -343,23 +338,23 @@ void GLWidget::renderBasketball()
         glm::vec4 new_pos = basketballModelMat0 * glm::vec4(0.0, 0.0, 0.0, 1.0);
         cur_pos = glm::vec3(new_pos);
 
-        Basketball cur_basketball = m_basketballList[i];
+        Basketball *cur_basketball = m_basketballList[i];
 
-        if (!cur_basketball.isFired())
+        if (!cur_basketball->isFired())
         {
             glm::vec3 cur_vel = glm::normalize(glm::transpose(glm::inverse(glm::mat3x3(basketballModelMat0))) *
                 glm::vec3(0.0, 0.0, -1));
-            cur_basketball.updateVel(cur_vel);
+            cur_basketball->updateVel(cur_vel);
         }
         else
         {
-            cur_pos = cur_basketball.getPos() + cur_basketball.getVel() * delta_t;
+            cur_pos = cur_basketball->getPos() + cur_basketball->getVel() * delta_t;
             basketballModelMat0 = glm::translate(glm::mat4(1.0f), cur_pos);
             basketballModelMat0 = glm::scale(basketballModelMat0, glm::vec3(scale));
         }
-        cur_basketball.updatePos(cur_pos);
+        cur_basketball->updatePos(cur_pos);
 
-        m_basketballList[i] = cur_basketball;
+//        m_basketballList[i] = cur_basketball;
 
 //        glm::vec3 tmp_pos = cur_basketball.getPos();
 //        std::cout<<tmp_pos.x<<" "<<tmp_pos.y<<" "<<tmp_pos.z<<std::endl;
@@ -369,8 +364,9 @@ void GLWidget::renderBasketball()
         //arrowModelMat0 = glm::scale( arrowModelMat0, glm::vec3( 0.075f) );
         m_shader.setUniform( "M_Matrix", Shader::MAT4, &basketballModelMat0[ 0 ][ 0 ] );
 //        printMatrix(basketballModelMat0);
-        m_sphere->draw();
 
+        if(!cur_basketball->isDisappeared())
+            m_sphere->draw();
     }
 }
 
@@ -788,9 +784,9 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 //            m_fired = false;
 //            m_timer.stop();
 //        }
-        Basketball cur_b = m_basketballList[m_basketballList.size() - 1];
-        cur_b.fireBasketball();
-        m_basketballList[m_basketballList.size() - 1] = cur_b;
+        Basketball *cur_b = m_basketballList[m_basketballList.size() - 1];
+        cur_b->fireBasketball();
+//        m_basketballList[m_basketballList.size() - 1] = cur_b;
         initBasketball();
         update();
     }

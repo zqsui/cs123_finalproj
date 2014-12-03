@@ -14,6 +14,11 @@ Basketball::Basketball(glm::vec3 pos, float mass)
 
 }
 
+bool Basketball::isDisappeared()
+{
+    return m_isDisappeard;
+}
+
 Basketball::~Basketball()
 {
 }

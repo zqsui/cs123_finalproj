@@ -14,6 +14,7 @@ public:
 
     bool isFired();
     bool isScored();
+    bool isDisappeared();
     float getEnergy();
     void updateEnergy();
     glm::vec3 getPos();
@@ -22,6 +23,7 @@ public:
     void updateVel(glm::vec3 vel);
     void updatePos(glm::vec3 pos);
     void fireBasketball();
+
 
 private:
      glm::vec3 m_pos;
