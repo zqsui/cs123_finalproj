@@ -20,7 +20,8 @@ SOURCES += \
     src/CamtransCamera.cpp \
     src/utils.cpp \
     src/Shape.cpp \
-    src/Basketball.cpp
+    src/Basketball.cpp \
+    src/Cube.cpp
 
 HEADERS += \
     src/mainwindow.h \
@@ -36,7 +37,8 @@ HEADERS += \
     src/Shape.h \
     src/Basketball.h \
     src/Physics.h \
-    src/SceneData.h
+    src/SceneData.h \
+    src/Cube.h
 
 FORMS += src/mainwindow.ui
 

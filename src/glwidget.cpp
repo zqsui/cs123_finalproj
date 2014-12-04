@@ -591,7 +591,6 @@ void GLWidget::processCollisionBall2Wall(Basketball *cur_basketball, Wall cur_wa
         std::cout<<"after scaling"<<std::endl;
         std::cout<<glm::length(ball_vel)<<std::endl;
         cur_basketball->updateVel(ball_vel);
-
     }
     else
     {

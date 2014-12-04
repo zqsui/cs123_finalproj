@@ -22,6 +22,9 @@ struct Wall{
     Plane plane;
 };
 
+struct BasketballStand{
+
+};
 
 
 
