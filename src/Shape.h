@@ -1,9 +1,9 @@
 #ifndef SHAPE_H
 #define SHAPE_H
-#define EPSILON 0.0001
+//#define EPSILON 0.0001
 #include "GL/glew.h"
 #include "glm/glm/glm.hpp"
-
+#include "utils.h"
 class Shape
 {
 public:

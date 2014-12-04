@@ -44,5 +44,27 @@ void momentumTheory(float m1, glm::vec3 &v1, float m2, glm::vec3 &v2, glm::vec3 
 }
 
 
+void momentumTheory(float m1, glm::vec3 &v1, float m2, glm::vec3 &v2, glm::vec3 hit_dir_obj1, float scale)
+{
+    glm::vec3 norm_hit_dir_obj1 = glm::normalize(hit_dir_obj1);
+    glm::vec3 v1Plus = norm_hit_dir_obj1 * glm::dot(v1, norm_hit_dir_obj1);
+    glm::vec3 v2Plus = -norm_hit_dir_obj1 * glm::dot(v2, -norm_hit_dir_obj1);
+    glm::vec3 v1Minus = v1 - v1Plus;
+    glm::vec3 v2Minus = v2 - v2Plus;
+
+    glm::vec3 v1Plus_prime = (v1Plus * (m1 - m2) + 2 * m2 * v2Plus)/(m1 + m2);
+    glm::vec3 v2Plus_prime = (v2Plus * (m2 - m1) + 2 * m1 * v1Plus)/(m1 + m2);
+
+
+    v1Plus_prime = v1Plus_prime * scale;
+    v2Plus_prime = v2Plus_prime * scale;
+    v1 = v1Plus_prime + v1Minus;
+    v2 = v2Plus_prime + v2Minus;
+}
+
+
+
+
+
 
 #endif // PHYSICS_H

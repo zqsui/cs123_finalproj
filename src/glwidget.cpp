@@ -50,7 +50,7 @@ GLWidget::~GLWidget()
     glDeleteBuffers(1, &m_vboID);
     glDeleteVertexArrays(1, &m_vaoID);
 
-    for(int i=0;i<m_basketballList.size();i++)
+    for(unsigned int i=0;i<m_basketballList.size();i++)
         delete (m_basketballList[i]);
 }
 
@@ -89,7 +89,7 @@ void GLWidget::initWall()
     Wall tmpWall;
     glm::vec3 Ka;
 
-    m_wallsize = 2.0;
+    m_wallsize = 7;
 
     float wallmass = 999999;
     glm::vec3 wallvel = glm::vec3(0.0);
@@ -263,7 +263,7 @@ void GLWidget::initTarget()
 
 void GLWidget::renderWall()
 {
-    for(int i = 0; i < m_wallList.size();i++)
+    for(unsigned int i = 0; i < m_wallList.size();i++)
     {
         Wall cur_wall = m_wallList[i];
         glm::vec3 Ka = cur_wall.Ka;
@@ -514,11 +514,11 @@ void GLWidget::renderBasketball()
 
 void GLWidget::processCollision(Basketball *cur_basketball, int k)
 {
-    for(int i = k+1;i < m_basketballList.size() - 1;i++)
+    for(unsigned int i = k+1;i < m_basketballList.size() - 1;i++)
         processCollisionBall2Ball(cur_basketball, m_basketballList[i]);
 
 
-    for(int i = 0; i < m_wallList.size(); i++)
+    for(unsigned int i = 0; i < m_wallList.size(); i++)
         processCollisionBall2Wall(cur_basketball, m_wallList[i]);
 }
 
@@ -530,9 +530,16 @@ void GLWidget::processCollisionBall2Ball(Basketball *basketball_1, Basketball *b
 //    if(EQ(dist, 0))
 //        return;
 
-    if(dist < (basketball_1->getRadius() + basketball_2->getRadius()))
+    float radius_sum = basketball_1->getRadius() + basketball_2->getRadius();
+
+    if(radius_sum - dist > EPSILON)
     {
         glm::vec3 dir = basketball_2->getPos() - basketball_1->getPos();
+        glm::vec3 pos1_new = basketball_1->getPos() - 1.0f/2.0f * (radius_sum - dist) * glm::normalize(dir);
+        glm::vec3 pos2_new = basketball_2->getPos() + 1.0f/2.0f * (radius_sum - dist) * glm::normalize(dir);
+
+        basketball_1->updatePos(pos1_new);
+        basketball_2->updatePos(pos2_new);
 
         glm::vec3 v1 = basketball_1->getVel();
         glm::vec3 v2 = basketball_2->getVel();
@@ -546,6 +553,10 @@ void GLWidget::processCollisionBall2Ball(Basketball *basketball_1, Basketball *b
         basketball_1->updateVel(v1);
         basketball_2->updateVel(v2);
     }
+    else
+    {
+        return;
+    }
 }
 
 void GLWidget::processCollisionBall2Wall(Basketball *cur_basketball, Wall cur_wall)
@@ -553,18 +564,38 @@ void GLWidget::processCollisionBall2Wall(Basketball *cur_basketball, Wall cur_wa
     float dist = point2PlaneDist(cur_basketball->getPos(), cur_wall.plane);
 //    std::cout<<dist << ' ' <<EPSILON + cur_basketball->getRadius()<<std::endl;
 
-    if(dist < cur_basketball->getRadius())
+    if(cur_basketball->getRadius() - dist > EPSILON)
     {
+        glm::vec3 dir = -cur_wall.normal;
+        glm::vec3 pos_new = cur_basketball->getPos() - 1.0f * (cur_basketball->getRadius()  - dist) * glm::normalize(dir);
+        cur_basketball->updatePos(pos_new);
+
         glm::vec3 ball_vel = cur_basketball->getVel();
         glm::vec3 wall_vel = cur_wall.vel;
         float ball_mass = cur_basketball->getMass();
         float wall_mass = cur_wall.mass;
-        momentumTheory(ball_mass, ball_vel, wall_mass, wall_vel, -cur_wall.normal);
-
-        float scale_v = 0.99;
+        std::cout<<"before momentum theory"<<std::endl;
+        std::cout<<glm::length(ball_vel)<<std::endl;
+        momentumTheory(ball_mass, ball_vel, wall_mass, wall_vel, dir);
+        std::cout<<"after momentum theory"<<std::endl;
+        std::cout<<glm::length(ball_vel)<<std::endl;
+        float scale_v;
+        float vel_length = glm::length(ball_vel);
+        if(vel_length<0.5)
+            scale_v = 0;
+        else if(vel_length < 1.5)
+            scale_v = 0.5;
+        else
+            scale_v = 0.9;
         ball_vel *= scale_v;
-
+        std::cout<<"after scaling"<<std::endl;
+        std::cout<<glm::length(ball_vel)<<std::endl;
         cur_basketball->updateVel(ball_vel);
+
+    }
+    else
+    {
+        return;
     }
 }
 
@@ -589,14 +620,14 @@ void GLWidget::renderArrow()
 
     // Set the velocity to reflect the rotation transforms we do to render the arrow.
     // We keep variables for all the values we need for this to simplify the velocity vector.
-    double cx = cos( -m_firedAngleX * M_PI / 180.0f );
-    double sx = sin( -m_firedAngleX * M_PI / 180.0f );
-    double cy = cos( m_firedAngleY * M_PI / 180.0f );
-    double omcy = 1.0f - cy;
-    double sy = sin( m_firedAngleY * M_PI / 180.0f );
+//    double cx = cos( -m_firedAngleX * M_PI / 180.0f );
+//    double sx = sin( -m_firedAngleX * M_PI / 180.0f );
+//    double cy = cos( m_firedAngleY * M_PI / 180.0f );
+//    double omcy = 1.0f - cy;
+//    double sy = sin( m_firedAngleY * M_PI / 180.0f );
 
-    double cmx = cos( M_PI * m_firedAngleX / 180.0f );
-    double smx = sin( M_PI * m_firedAngleX / 180.0f );
+//    double cmx = cos( M_PI * m_firedAngleX / 180.0f );
+//    double smx = sin( M_PI * m_firedAngleX / 180.0f );
 
 
 
@@ -691,7 +722,7 @@ void GLWidget::renderArrow()
 //                qMax( 15.0f - ( time * 30 ), 0.5f ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
 //    }
 
-    glm::mat4 arrowModelMat1 = arrowModelMat0;
+//    glm::mat4 arrowModelMat1 = arrowModelMat0;
 
     // Arrowhead
     glm::vec3 Ka = glm::vec3( 1.0f, 0.0f, 0.0f );
@@ -849,7 +880,7 @@ void GLWidget::updateCamera()
 {
     float w = width();
     float h = height();
-    float aspectRatio = 1.0f * w / h;
+//    float aspectRatio = 1.0f * w / h;
 //    m_projectionMatrix = glm::mat4(1.0);
 //    m_projectionMatrix = glm::perspective( m_camera.fovy, aspectRatio, m_camera.near, m_camera.far );
 
