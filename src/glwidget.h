@@ -1,7 +1,7 @@
 #ifndef glwidget_H
 #define glwidget_H
 
-#include "Quad.h"
+#include "shape/Quad.h"
 
 #include <QGLWidget>
 #include <QTimer>
@@ -12,14 +12,14 @@
 
 #include "glm/glm/glm.hpp"
 
-#include "Camera.h"
+#include "camera/Camera.h"
 #include "Shader.h"
-#include "Sphere.h"
-#include "CamtransCamera.h"
-#include "Basketball.h"
-#include "Shape.h"
+#include "shape/Sphere.h"
+#include "camera/CamtransCamera.h"
+#include "scene/Basketball.h"
+#include "shape/Shape.h"
 
-#include "SceneData.h"
+#include "scene/SceneData.h"
 
 
 

@@ -11,34 +11,36 @@ unix:!macx: LIBS += -lGLEW
 SOURCES += \
     src/main.cpp \
     src/mainwindow.cpp \
-    src/Quad.cpp \
+    shape/Quad.cpp \
     src/DataBinding.cpp \
     src/Settings.cpp \
     src/Shader.cpp \
-    src/Sphere.cpp \
+    shape/Sphere.cpp \
     src/glwidget.cpp \
-    src/CamtransCamera.cpp \
-    src/utils.cpp \
-    src/Shape.cpp \
-    src/Basketball.cpp \
-    src/Cube.cpp
+    camera/CamtransCamera.cpp \
+    helper/utils.cpp \
+    shape/Shape.cpp \
+    scene/Basketball.cpp \
+    shape/Cube.cpp \
+    shape/Cylinder.cpp
 
 HEADERS += \
     src/mainwindow.h \
-    src/Quad.h \
+    shape/Quad.h \
     src/DataBinding.h \
     src/Settings.h \
     src/Shader.h \
-    src/Sphere.h \
-    src/Camera.h \
+    shape/Sphere.h \
+    camera/Camera.h \
     src/glwidget.h \
-    src/CamtransCamera.h \
-    src/utils.h \
-    src/Shape.h \
-    src/Basketball.h \
-    src/Physics.h \
-    src/SceneData.h \
-    src/Cube.h
+    camera/CamtransCamera.h \
+    helper/utils.h \
+    shape/Shape.h \
+    scene/Basketball.h \
+    helper/Physics.h \
+    scene/SceneData.h \
+    shape/Cube.h \
+    shape/Cylinder.h
 
 FORMS += src/mainwindow.ui
 

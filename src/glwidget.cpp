@@ -7,8 +7,8 @@
 #include "glm/glm/glm.hpp"
 #include "glm/glm/gtc/matrix_transform.hpp"
 #include "glm/glm/gtx/string_cast.hpp"
-#include "Physics.h"
-#include "utils.h"
+#include "helper/Physics.h"
+#include "helper/utils.h"
 
 
 GLWidget::GLWidget(QWidget *parent)
@@ -535,11 +535,11 @@ void GLWidget::processCollisionBall2Ball(Basketball *basketball_1, Basketball *b
     if(radius_sum - dist > EPSILON)
     {
         glm::vec3 dir = basketball_2->getPos() - basketball_1->getPos();
-        glm::vec3 pos1_new = basketball_1->getPos() - 1.0f/2.0f * (radius_sum - dist) * glm::normalize(dir);
-        glm::vec3 pos2_new = basketball_2->getPos() + 1.0f/2.0f * (radius_sum - dist) * glm::normalize(dir);
+        glm::vec3 pos1_new = basketball_1->getPos() - 1.0f * (radius_sum - dist) * glm::normalize(dir);
+        //glm::vec3 pos2_new = basketball_2->getPos() + 1.0f/2.0f * (radius_sum - dist) * glm::normalize(dir);
 
         basketball_1->updatePos(pos1_new);
-        basketball_2->updatePos(pos2_new);
+        //basketball_2->updatePos(pos2_new);
 
         glm::vec3 v1 = basketball_1->getVel();
         glm::vec3 v2 = basketball_2->getVel();
@@ -574,11 +574,11 @@ void GLWidget::processCollisionBall2Wall(Basketball *cur_basketball, Wall cur_wa
         glm::vec3 wall_vel = cur_wall.vel;
         float ball_mass = cur_basketball->getMass();
         float wall_mass = cur_wall.mass;
-        std::cout<<"before momentum theory"<<std::endl;
-        std::cout<<glm::length(ball_vel)<<std::endl;
+//        std::cout<<"before momentum theory"<<std::endl;
+//        std::cout<<glm::length(ball_vel)<<std::endl;
         momentumTheory(ball_mass, ball_vel, wall_mass, wall_vel, dir);
-        std::cout<<"after momentum theory"<<std::endl;
-        std::cout<<glm::length(ball_vel)<<std::endl;
+//        std::cout<<"after momentum theory"<<std::endl;
+//        std::cout<<glm::length(ball_vel)<<std::endl;
         float scale_v;
         float vel_length = glm::length(ball_vel);
         if(vel_length<0.5)
@@ -588,8 +588,8 @@ void GLWidget::processCollisionBall2Wall(Basketball *cur_basketball, Wall cur_wa
         else
             scale_v = 0.9;
         ball_vel *= scale_v;
-        std::cout<<"after scaling"<<std::endl;
-        std::cout<<glm::length(ball_vel)<<std::endl;
+//        std::cout<<"after scaling"<<std::endl;
+//        std::cout<<glm::length(ball_vel)<<std::endl;
         cur_basketball->updateVel(ball_vel);
     }
     else
