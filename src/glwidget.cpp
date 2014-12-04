@@ -7,7 +7,8 @@
 #include "glm/glm/glm.hpp"
 #include "glm/glm/gtc/matrix_transform.hpp"
 #include "glm/glm/gtx/string_cast.hpp"
-
+#include "Physics.h"
+#include "utils.h"
 
 
 GLWidget::GLWidget(QWidget *parent)
@@ -48,6 +49,9 @@ GLWidget::~GLWidget()
 {
     glDeleteBuffers(1, &m_vboID);
     glDeleteVertexArrays(1, &m_vaoID);
+
+    for(int i=0;i<m_basketballList.size();i++)
+        delete (m_basketballList[i]);
 }
 
 
@@ -77,10 +81,117 @@ void GLWidget::initShapes()
 void GLWidget::initBasketball()
 {
     glm::vec3 pos = glm::vec3( -m_firedXDiff, 2, -m_firedZDiff );
-    m_basketballList.push_back(new Basketball(pos, 1));
+    m_basketballList.push_back(new Basketball(pos, 1, 0.5 * 0.3));
 }
 
+void GLWidget::initWall()
+{
+    Wall tmpWall;
+    glm::vec3 Ka;
 
+    m_wallsize = 2.0;
+
+    float wallmass = 999999;
+    glm::vec3 wallvel = glm::vec3(0.0);
+
+//    // Ceiling
+    glm::mat4 modelMat = glm::mat4(1.0f);
+    tmpWall.Ka =  glm::vec3( 0.0f, 0.7f, 0.93f);
+    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, m_wallsize, 0.0f ) );
+    modelMat = glm::scale( modelMat, glm::vec3( m_wallsize ) );
+    modelMat = glm::rotate(modelMat, 90.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+    tmpWall.modelMat = modelMat;
+    tmpWall.plane.a = 0.0;
+    tmpWall.plane.b = 1.0;
+    tmpWall.plane.c = 0.0;
+    tmpWall.plane.d = -m_wallsize;
+    tmpWall.mass = wallmass;
+    tmpWall.vel = wallvel;
+    tmpWall.normal = glm::vec3(0.0, -1.0, 0.0);
+    m_wallList.push_back(tmpWall);
+
+    // Back
+    modelMat = glm::mat4(1.0f);
+    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 0.0f, m_wallsize ) );
+    modelMat = glm::scale( modelMat, glm::vec3( m_wallsize ) );
+    modelMat = glm::rotate(modelMat, 180.0f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
+    tmpWall.Ka =  glm::vec3( 0.0f, 0.7f, 0.93f);
+    tmpWall.modelMat = modelMat;
+    tmpWall.plane.a = 0.0;
+    tmpWall.plane.b = 0.0;
+    tmpWall.plane.c = 1.0;
+    tmpWall.plane.d = -m_wallsize;
+    tmpWall.mass = wallmass;
+    tmpWall.vel = wallvel;
+    tmpWall.normal = glm::vec3(0.0, 0.0, -1.0);
+    m_wallList.push_back(tmpWall);
+
+    // Right
+    modelMat = glm::mat4(1.0f);
+    modelMat = glm::translate( modelMat, glm::vec3( m_wallsize, 0.0f, 0.0f ) );
+    modelMat = glm::scale( modelMat, glm::vec3( m_wallsize ) );
+    modelMat = glm::rotate(modelMat, -90.0f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
+    tmpWall.Ka =  glm::vec3( 0.0f, 0.7f, 0.93f);
+    tmpWall.modelMat = modelMat;
+    tmpWall.plane.a = 1.0;
+    tmpWall.plane.b = 0.0;
+    tmpWall.plane.c = 0.0;
+    tmpWall.plane.d = -m_wallsize;
+    tmpWall.mass = wallmass;
+    tmpWall.vel = wallvel;
+    tmpWall.normal = glm::vec3(-1.0, 0.0, 0.0);
+    m_wallList.push_back(tmpWall);
+
+    // Left
+   modelMat = glm::mat4(1.0f);
+   modelMat = glm::translate( modelMat, glm::vec3( -m_wallsize, 0.0f, 0.0f ) );
+   modelMat = glm::scale( modelMat, glm::vec3( m_wallsize) );
+   modelMat = glm::rotate(modelMat, 90.0f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
+   tmpWall.Ka =  glm::vec3( 0.0f, 0.7f, 0.93f);
+   tmpWall.modelMat = modelMat;
+   tmpWall.plane.a = 1.0;
+   tmpWall.plane.b = 0.0;
+   tmpWall.plane.c = 0.0;
+   tmpWall.plane.d = m_wallsize;
+   tmpWall.mass = wallmass;
+   tmpWall.vel = wallvel;
+   tmpWall.normal = glm::vec3(1.0, 0.0, 0.0);
+   m_wallList.push_back(tmpWall);
+
+    //front
+   Ka = glm::vec3(0.9f, 0.74f, 0.2f);
+   modelMat = glm::mat4(1.0f);
+   modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 0.0f, -m_wallsize ) );
+   modelMat = glm::scale( modelMat, glm::vec3( m_wallsize ) );
+   tmpWall.Ka =  Ka;
+   tmpWall.modelMat = modelMat;
+   tmpWall.plane.a = 0.0;
+   tmpWall.plane.b = 0.0;
+   tmpWall.plane.c = 1.0;
+   tmpWall.plane.d = m_wallsize;
+   tmpWall.mass = wallmass;
+   tmpWall.vel = wallvel;
+   tmpWall.normal = glm::vec3(0.0, 0.0, 1.0);
+   m_wallList.push_back(tmpWall);
+
+   //ground
+   Ka = glm::vec3(0.3f, 0.74f, 0.2f);
+   m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
+   modelMat = glm::mat4(1.0f);
+   modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 0.0f, 0.0f ) );
+   modelMat = glm::scale( modelMat, glm::vec3( m_wallsize) );
+   modelMat = glm::rotate(modelMat, -90.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+   tmpWall.Ka =  Ka;
+   tmpWall.modelMat = modelMat;
+   tmpWall.plane.a = 0.0;
+   tmpWall.plane.b = 1.0;
+   tmpWall.plane.c = 0.0;
+   tmpWall.plane.d = 0.0;
+   tmpWall.mass = wallmass;
+   tmpWall.vel = wallvel;
+   tmpWall.normal = glm::vec3(0.0, 1.0, 0.0);
+   m_wallList.push_back(tmpWall);
+}
 /**
  * Initializes the target's vertex and normal data.
  */
@@ -146,6 +257,21 @@ void GLWidget::initTarget()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 
+}
+
+
+
+void GLWidget::renderWall()
+{
+    for(int i = 0; i < m_wallList.size();i++)
+    {
+        Wall cur_wall = m_wallList[i];
+        glm::vec3 Ka = cur_wall.Ka;
+        glm::mat4 modelMat =cur_wall.modelMat;
+        m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
+        m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
+        m_quad->draw();
+    }
 }
 
 
@@ -266,6 +392,8 @@ void GLWidget::initializeGL()
     updateCamera();
     initShapes();
     initBasketball();
+    initWall();
+
 }
 
 
@@ -293,8 +421,8 @@ void GLWidget::paintGL()
 
 //    renderArrow();
     renderBasketball();
-
-    renderRoom();
+    renderWall();
+    //renderRoom();
 
     //Render intersection spheres
 //    if(m_canCollide && settings.showIntersectSpheres)
@@ -315,12 +443,11 @@ void GLWidget::paintGL()
 void GLWidget::renderBasketball()
 {
 //    std::cout<<m_basketballList.size()<<std::endl;
-
-
-    for(int i = 0; i<m_basketballList.size();i++)
+    for(unsigned int i = 0; i<m_basketballList.size();i++)
     {
         float delta_t = 1.0f/(float)m_fps;
-        float scale = 0.3;
+        Basketball *cur_basketball = m_basketballList[i];
+        float scale = cur_basketball->getRadius() * 2;
 
         glm::vec3 cur_pos = glm::vec3( -m_firedXDiff, 2, -m_firedZDiff );
 //        std::cout<<cur_pos.x<<" "<<cur_pos.y<<" "<<cur_pos.z<<std::endl;
@@ -338,33 +465,46 @@ void GLWidget::renderBasketball()
         glm::vec4 new_pos = basketballModelMat0 * glm::vec4(0.0, 0.0, 0.0, 1.0);
         cur_pos = glm::vec3(new_pos);
 
-        Basketball *cur_basketball = m_basketballList[i];
-
         if (!cur_basketball->isFired())
         {
             glm::vec3 cur_vel = glm::transpose(glm::inverse(glm::mat3x3(basketballModelMat0))) *
                 glm::vec3(0.0, 0.0, -1);
+            cur_vel = cur_vel * 2.0f;
             cur_basketball->updateVel(cur_vel);
-            std::cout<<glm::length(cur_vel)<<std::endl;
+            //std::cout<<glm::length(cur_vel)<<std::endl;
+            cur_basketball->updatePos(cur_pos);
         }
         else
         {
-            cur_pos = cur_basketball->getPos() + cur_basketball->getVel() * delta_t;
+            glm::vec3 accel = glm::vec3(0.0, -GRAVITY, 0.0);
+            glm::vec3 next_vel = accelVel(cur_basketball->getVel(), accel, delta_t);
+            glm::vec3 delta_s = computeDisplacement(cur_basketball->getVel(),
+                                                    accel, delta_t);
+            cur_pos = cur_basketball->getPos() + delta_s;
+            cur_basketball->updateVel(next_vel);
+            cur_basketball->updatePos(cur_pos);
+            //cur_pos = cur_basketball->getPos() + cur_basketball->getVel() * delta_t;
             basketballModelMat0 = glm::translate(glm::mat4(1.0f), cur_pos);
             basketballModelMat0 = glm::scale(basketballModelMat0, glm::vec3(scale));
+
+            processCollision(cur_basketball, i);
+//            if((cur_pos.z - (-5))<EPSILON + scale * 0.5)
+//            {
+//                glm::vec3 ball_vel = cur_basketball->getVel();
+//                glm::vec3 wall_vel = glm::vec3(0.0f);
+//                float ball_mass = cur_basketball->getMass();
+//                float wall_mass = 99999;
+//                momentumTheory(ball_mass, ball_vel, wall_mass, wall_vel, glm::vec3(0.0, 0.0, -1.0f));
+//                cur_basketball->updateVel(ball_vel);
+//            }
+
         }
-        cur_basketball->updatePos(cur_pos);
 
-//        m_basketballList[i] = cur_basketball;
-
-//        glm::vec3 tmp_pos = cur_basketball.getPos();
-//        std::cout<<tmp_pos.x<<" "<<tmp_pos.y<<" "<<tmp_pos.z<<std::endl;
 
         glm::vec3 Ka = glm::vec3( 1.0f, 0.0f, 0.0f );
         m_shader.setUniform( "Ka", Shader::VEC3, &Ka );
-        //arrowModelMat0 = glm::scale( arrowModelMat0, glm::vec3( 0.075f) );
         m_shader.setUniform( "M_Matrix", Shader::MAT4, &basketballModelMat0[ 0 ][ 0 ] );
-//        printMatrix(basketballModelMat0);
+
 
         if(!cur_basketball->isDisappeared())
             m_sphere->draw();
@@ -372,9 +512,61 @@ void GLWidget::renderBasketball()
 }
 
 
+void GLWidget::processCollision(Basketball *cur_basketball, int k)
+{
+    for(int i = k+1;i < m_basketballList.size() - 1;i++)
+        processCollisionBall2Ball(cur_basketball, m_basketballList[i]);
 
 
+    for(int i = 0; i < m_wallList.size(); i++)
+        processCollisionBall2Wall(cur_basketball, m_wallList[i]);
+}
 
+
+void GLWidget::processCollisionBall2Ball(Basketball *basketball_1, Basketball *basketball_2)
+{
+    float dist = point2PointDist(basketball_1->getPos(), basketball_2->getPos());
+
+//    if(EQ(dist, 0))
+//        return;
+
+    if(dist < (basketball_1->getRadius() + basketball_2->getRadius()))
+    {
+        glm::vec3 dir = basketball_2->getPos() - basketball_1->getPos();
+
+        glm::vec3 v1 = basketball_1->getVel();
+        glm::vec3 v2 = basketball_2->getVel();
+
+        momentumTheory(basketball_1->getMass(), v1,
+                       basketball_2->getMass(), v2,
+                       dir);
+//        float scale_v = 0.9;
+//        v1 *= scale_v;
+//        v2 *= scale_v;
+        basketball_1->updateVel(v1);
+        basketball_2->updateVel(v2);
+    }
+}
+
+void GLWidget::processCollisionBall2Wall(Basketball *cur_basketball, Wall cur_wall)
+{
+    float dist = point2PlaneDist(cur_basketball->getPos(), cur_wall.plane);
+//    std::cout<<dist << ' ' <<EPSILON + cur_basketball->getRadius()<<std::endl;
+
+    if(dist < cur_basketball->getRadius())
+    {
+        glm::vec3 ball_vel = cur_basketball->getVel();
+        glm::vec3 wall_vel = cur_wall.vel;
+        float ball_mass = cur_basketball->getMass();
+        float wall_mass = cur_wall.mass;
+        momentumTheory(ball_mass, ball_vel, wall_mass, wall_vel, -cur_wall.normal);
+
+        float scale_v = 0.99;
+        ball_vel *= scale_v;
+
+        cur_basketball->updateVel(ball_vel);
+    }
+}
 
 
 

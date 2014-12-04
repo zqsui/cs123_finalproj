@@ -35,7 +35,8 @@ HEADERS += \
     src/utils.h \
     src/Shape.h \
     src/Basketball.h \
-    src/Physics.h
+    src/Physics.h \
+    src/SceneData.h
 
 FORMS += src/mainwindow.ui
 

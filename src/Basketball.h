@@ -9,7 +9,7 @@
 class Basketball
 {
 public:
-    Basketball(glm::vec3 pos, float mass);
+    Basketball(glm::vec3 pos, float mass, float radius);
     virtual ~Basketball();
 
     bool isFired();
@@ -23,6 +23,9 @@ public:
     void updateVel(glm::vec3 vel);
     void updatePos(glm::vec3 pos);
     void fireBasketball();
+    void setRadius(float radius);
+    float getRadius();
+
 
 
 private:
@@ -33,6 +36,7 @@ private:
      bool m_isDisappeard;
      float m_mass;
      bool m_isFired;
+     float m_radius;
 
 };
 

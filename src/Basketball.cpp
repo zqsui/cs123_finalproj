@@ -1,16 +1,17 @@
 #include "Basketball.h"
 
-Basketball::Basketball(glm::vec3 pos, float mass)
+Basketball::Basketball(glm::vec3 pos, float mass, float radius)
 {
     m_pos = pos;
     m_mass = mass;
     m_vel = glm::vec3(0.0);
     updateEnergy();
 
-
+    m_radius = radius;
     m_isScored = false;
     m_isDisappeard = false;
     m_isFired = false;
+
 
 }
 
@@ -73,3 +74,15 @@ void Basketball::fireBasketball()
 {
     m_isFired = true;
 }
+
+void Basketball::setRadius(float radius)
+{
+    m_radius = radius;
+}
+
+float Basketball::getRadius()
+{
+    return m_radius;
+}
+
+

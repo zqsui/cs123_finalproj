@@ -19,6 +19,8 @@
 #include "Basketball.h"
 #include "Shape.h"
 
+#include "SceneData.h"
+
 
 
 class GLWidget : public QGLWidget
@@ -53,6 +55,7 @@ private:
     void initSphere();
 
     void initBasketball();
+    void initWall();
 
     // Rendering methods.
     void renderArrowSphere();
@@ -62,6 +65,11 @@ private:
     void renderArrow();
     void renderBow();
     void renderQuad();
+    void renderWall();
+
+    void processCollision(Basketball *cur_basketball, int k);
+    void processCollisionBall2Ball(Basketball *basketball_1, Basketball *basketball_2);
+    void processCollisionBall2Wall(Basketball *cur_basketball, Wall cur_wall);
 
 
     void renderBasketball();
@@ -108,6 +116,7 @@ private:
     QLabel * m_testLabel;
     bool m_canCollide;
     int m_n_all;
+    float m_wallsize;
 
     GLuint m_vaoID;
     GLuint m_vboID;
@@ -121,6 +130,7 @@ private:
 
 
     std::vector<Basketball *> m_basketballList;
+    std::vector<Wall> m_wallList;
 
 };
 
