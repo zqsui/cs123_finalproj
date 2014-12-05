@@ -42,6 +42,8 @@ GLWidget::GLWidget(QWidget *parent)
 
     m_arrowPos = glm::vec3(0,-3.0f,0);
     m_targetPos = m_arrowPos;
+
+    m_power = 0;
 }
 
 
@@ -987,10 +989,26 @@ void GLWidget::keyPressEvent ( QKeyEvent * event )
         m_originalMouseX = -1;
         m_originalMouseY = -1;
     }
-    else if(event->key() == Qt::Key_Space)
+    if(event->key() == Qt::Key_Space)
     {
-        std::cout << "press space key" << std::endl;
+        std::cout << "space press!" << std::endl;
+        m_power++;
+        m_powerSlot->setValue(m_power);
+        update();
     }
+}
+
+void GLWidget::keyReleaseEvent ( QKeyEvent * event ){
+    if ( !event->isAutoRepeat() && event->key() == Qt::Key_Space){
+        std::cout << "space release!" << std::endl;
+        m_powerSlot->setValue(m_power);
+        Basketball *cur_b = m_basketballList[m_basketballList.size() - 1];
+        cur_b->fireBasketball();
+        initBasketball();
+        m_power = 0;
+        update();
+    }
+
 }
 
 
@@ -1049,11 +1067,11 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 //            m_fired = false;
 //            m_timer.stop();
 //        }
-        Basketball *cur_b = m_basketballList[m_basketballList.size() - 1];
-        cur_b->fireBasketball();
-//        m_basketballList[m_basketballList.size() - 1] = cur_b;
-        initBasketball();
-        update();
+//        Basketball *cur_b = m_basketballList[m_basketballList.size() - 1];
+//        cur_b->fireBasketball();
+////        m_basketballList[m_basketballList.size() - 1] = cur_b;
+//        initBasketball();
+//        update();
     }
 
 }
@@ -1089,9 +1107,10 @@ void GLWidget::setLabel(QLabel* label)
 {
     m_scoreLabel = label;
 }
-void GLWidget::setLabel_test(QLabel* label)
+
+void GLWidget::setProgressBar(QProgressBar *pBar)
 {
-    m_testLabel = label;
+    m_powerSlot = pBar;
 }
 
 

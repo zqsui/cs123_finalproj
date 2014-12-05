@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1084</width>
-    <height>513</height>
+    <height>536</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
      <x>0</x>
      <y>0</y>
      <width>1084</width>
-     <height>19</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -39,7 +39,7 @@
    <property name="minimumSize">
     <size>
      <width>483</width>
-     <height>472</height>
+     <height>503</height>
     </size>
    </property>
    <property name="features">
@@ -130,7 +130,17 @@
      <item>
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>Click to shoot in first person mode</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press Space to shoot in first person mode&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QProgressBar" name="progressBar">
+       <property name="value">
+        <number>24</number>
+       </property>
+       <property name="format">
+        <string>%p</string>
        </property>
       </widget>
      </item>

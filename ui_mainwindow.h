@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created by: Qt User Interface Compiler version 5.2.0
+** Created by: Qt User Interface Compiler version 5.3.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -20,6 +20,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QProgressBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 #include "glwidget.h"
@@ -42,12 +43,13 @@ public:
     QLabel *label_2;
     QLabel *label_3;
     QLabel *label_4;
+    QProgressBar *progressBar;
 
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(1084, 513);
+        MainWindow->resize(1084, 536);
         actionQuit = new QAction(MainWindow);
         actionQuit->setObjectName(QStringLiteral("actionQuit"));
         centralWidget = new GLWidget(MainWindow);
@@ -62,7 +64,7 @@ public:
         MainWindow->setMenuBar(menuBar);
         settingsDock = new QDockWidget(MainWindow);
         settingsDock->setObjectName(QStringLiteral("settingsDock"));
-        settingsDock->setMinimumSize(QSize(483, 472));
+        settingsDock->setMinimumSize(QSize(483, 503));
         settingsDock->setFeatures(QDockWidget::DockWidgetMovable);
         settingsDockContent = new QWidget();
         settingsDockContent->setObjectName(QStringLiteral("settingsDockContent"));
@@ -108,6 +110,12 @@ public:
 
         settingsLayout->addWidget(label_4);
 
+        progressBar = new QProgressBar(settingsDockContent);
+        progressBar->setObjectName(QStringLiteral("progressBar"));
+        progressBar->setValue(0);
+
+        settingsLayout->addWidget(progressBar);
+
         settingsDock->setWidget(settingsDockContent);
         MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(1), settingsDock);
 
@@ -131,7 +139,8 @@ public:
         label->setText(QApplication::translate("MainWindow", "Click on the scene to enter first person mode", 0));
         label_2->setText(QApplication::translate("MainWindow", "Hit esc to exit first person mode", 0));
         label_3->setText(QApplication::translate("MainWindow", "Move with WASD and look around with the mouse", 0));
-        label_4->setText(QApplication::translate("MainWindow", "Click to shoot in first person mode", 0));
+        label_4->setText(QApplication::translate("MainWindow", "<html><head/><body><p>Press Space to shoot in first person mode</p></body></html>", 0));
+        progressBar->setFormat(QApplication::translate("MainWindow", "%p", 0));
     } // retranslateUi
 
 };

@@ -9,6 +9,7 @@
 #include <QMouseEvent>
 #include <iostream>
 #include <QLabel>
+#include <QProgressBar>
 
 #include "glm/glm/glm.hpp"
 
@@ -36,7 +37,7 @@ public:
     void updateCamera();
     void rotateCamera(float deltaX, float deltaY);
     void setLabel(QLabel* label);
-    void setLabel_test(QLabel* label);
+    void setProgressBar(QProgressBar *pBar);
 
 protected:
     void initializeGL();
@@ -45,6 +46,8 @@ protected:
     void keyPressEvent ( QKeyEvent * event );
     void mouseMoveEvent ( QMouseEvent * event );
     void mousePressEvent ( QMouseEvent * event );
+
+    void keyReleaseEvent ( QKeyEvent * event );
 
 protected slots:
     void tick();
@@ -118,6 +121,9 @@ private:
     int m_score;
     QLabel * m_scoreLabel;
     QLabel * m_testLabel;
+    QProgressBar * m_powerSlot;
+
+    int m_power;
     bool m_canCollide;
     int m_n_all;
     float m_wallsize;

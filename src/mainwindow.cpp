@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     dataBind();
     m_ui->centralWidget->setLabel(m_ui->scoreLabel);
-    m_ui->centralWidget->setLabel_test(m_ui->label_2);
+    m_ui->centralWidget->setProgressBar(m_ui->progressBar);
 
 }
 
