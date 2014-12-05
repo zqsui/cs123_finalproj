@@ -22,7 +22,8 @@ SOURCES += \
     shape/Shape.cpp \
     scene/Basketball.cpp \
     shape/Cube.cpp \
-    shape/Cylinder.cpp
+    shape/Cylinder.cpp \
+    shape/Torus.cpp
 
 HEADERS += \
     src/mainwindow.h \
@@ -40,7 +41,8 @@ HEADERS += \
     helper/Physics.h \
     scene/SceneData.h \
     shape/Cube.h \
-    shape/Cylinder.h
+    shape/Cylinder.h \
+    shape/Torus.h
 
 FORMS += src/mainwindow.ui
 

@@ -14,10 +14,11 @@
 
 #include "camera/Camera.h"
 #include "Shader.h"
-#include "shape/Sphere.h"
 #include "camera/CamtransCamera.h"
 #include "scene/Basketball.h"
 #include "shape/Shape.h"
+#include "shape/Sphere.h"
+#include "shape/Torus.h"
 
 #include "scene/SceneData.h"
 
@@ -56,6 +57,7 @@ private:
 
     void initBasketball();
     void initWall();
+    void initBasket();
 
     // Rendering methods.
     void renderArrowSphere();
@@ -66,6 +68,7 @@ private:
     void renderBow();
     void renderQuad();
     void renderWall();
+    void renderBasket();
 
     void processCollision(Basketball *cur_basketball, int k);
     void processCollisionBall2Ball(Basketball *basketball_1, Basketball *basketball_2);
@@ -94,6 +97,7 @@ private:
     Shader m_shader;
     Quad* m_quad;
     Sphere* m_sphere;
+    Torus* m_torus;
 
     CamtransCamera m_camera;
     glm::mat4 m_projectionMatrix;
@@ -117,6 +121,7 @@ private:
     bool m_canCollide;
     int m_n_all;
     float m_wallsize;
+    float m_basketsize;
 
     GLuint m_vaoID;
     GLuint m_vboID;
@@ -131,6 +136,8 @@ private:
 
     std::vector<Basketball *> m_basketballList;
     std::vector<Wall> m_wallList;
+
+    Basket m_basket;
 
 };
 

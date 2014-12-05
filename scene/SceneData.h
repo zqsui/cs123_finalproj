@@ -22,6 +22,15 @@ struct Wall{
     Plane plane;
 };
 
+struct Basket{
+    glm::vec3 Ka;
+    glm::mat4 modelMat;
+    float mass;
+    glm::vec3 vel;
+    glm::vec3 normal;
+    Plane plane;
+};
+
 struct BasketballStand{
 
 };

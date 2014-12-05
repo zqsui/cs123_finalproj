@@ -76,8 +76,29 @@ void GLWidget::initShapes()
                           m_shader.attrib("in_Position"),
                           m_shader.attrib("in_Normal"),
                           m_shader.attrib("texCoord") );
+    m_torus = new Torus(30, 30, 10,
+                          m_shader.attrib("in_Position"),
+                          m_shader.attrib("in_Normal"),
+                          m_shader.attrib("texCoord") );
+
     //initTarget();
 }
+
+void GLWidget::initBasket(){
+    m_basketsize = 0.6;
+
+    m_basket.Ka = glm::vec3( 0.5f, 0.0f, 0.0f);
+    m_basket.mass = 999999;
+    m_basket.vel = glm::vec3(0.0);
+
+    glm::mat4 modelMat = glm::mat4(1.0f);
+    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 2.9f, -m_wallsize + m_basketsize * 0.5f ) );
+    modelMat = glm::scale( modelMat, glm::vec3( m_basketsize ) );
+    modelMat = glm::rotate( modelMat, -90.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+    m_basket.modelMat = modelMat;
+}
+
+
 void GLWidget::initBasketball()
 {
     glm::vec3 pos = glm::vec3( -m_firedXDiff, 2, -m_firedZDiff );
@@ -274,6 +295,15 @@ void GLWidget::renderWall()
     }
 }
 
+void GLWidget::renderBasket()
+{
+    glm::vec3 Ka = m_basket.Ka;
+    glm::mat4 modelMat =m_basket.modelMat;
+    m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
+    m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
+    m_torus->draw();
+}
+
 
 /**
  * Renders the target and sets its position via setTargetPosition.
@@ -393,6 +423,7 @@ void GLWidget::initializeGL()
     initShapes();
     initBasketball();
     initWall();
+    initBasket();
 
 }
 
@@ -422,6 +453,7 @@ void GLWidget::paintGL()
 //    renderArrow();
     renderBasketball();
     renderWall();
+    renderBasket();
     //renderRoom();
 
     //Render intersection spheres
@@ -954,6 +986,10 @@ void GLWidget::keyPressEvent ( QKeyEvent * event )
         m_firstPersonMode = false;
         m_originalMouseX = -1;
         m_originalMouseY = -1;
+    }
+    else if(event->key() == Qt::Key_Space)
+    {
+        std::cout << "press space key" << std::endl;
     }
 }
 
