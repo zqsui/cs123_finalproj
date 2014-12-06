@@ -32,7 +32,21 @@ struct Basket{
 };
 
 struct BasketballStand{
+    glm::vec3 Ka;
+    glm::mat4 modelMat;
+    float mass;
+    glm::vec3 vel;
+    glm::vec3 normal;
+    Plane plane;
+};
 
+struct BackBoard{
+    glm::vec3 Ka;
+    glm::mat4 modelMat;
+    float mass;
+    glm::vec3 vel;
+    glm::vec3 normal;
+    Plane plane;
 };
 
 

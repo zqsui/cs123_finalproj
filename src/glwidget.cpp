@@ -83,6 +83,10 @@ void GLWidget::initShapes()
                           m_shader.attrib("in_Normal"),
                           m_shader.attrib("texCoord") );
 
+    m_cylinder = new Cylinder(30, 30, 1,
+                              m_shader.attrib("in_Position"),
+                              m_shader.attrib("in_Normal"),
+                              m_shader.attrib("texCoord") );
     //initTarget();
 }
 
@@ -94,10 +98,53 @@ void GLWidget::initBasket(){
     m_basket.vel = glm::vec3(0.0);
 
     glm::mat4 modelMat = glm::mat4(1.0f);
-    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 2.9f, -m_wallsize + m_basketsize * 0.5f ) );
+    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 2.9f, -m_wallsize + m_basketsize * 0.5f + 0.5f) );
     modelMat = glm::scale( modelMat, glm::vec3( m_basketsize ) );
     modelMat = glm::rotate( modelMat, -90.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
     m_basket.modelMat = modelMat;
+}
+
+void GLWidget::initBasketballStand()
+{
+    BasketballStand tmpStand;
+    m_standsize = 0.1f;
+    float standmass = 999999;
+    glm::vec3 standvel = glm::vec3(0.0);
+    glm::mat4 modelMat = glm::mat4(1.0f);
+
+    //vertical stand
+    tmpStand.Ka = glm::vec3( 0.0f, 0.0f, 0.0f);
+    tmpStand.mass = standmass;
+    tmpStand.vel = standvel;
+    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 1.75f, -m_wallsize + m_standsize/2) );
+    modelMat = glm::scale( modelMat, glm::vec3( m_standsize, 3.5f, m_standsize) );
+    tmpStand.modelMat = modelMat;
+    m_basketballStandList.push_back(tmpStand);
+
+
+    //parallel stand
+    modelMat = glm::mat4(1.0f);
+    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 3.5f, -m_wallsize + 0.5f/2 - 0.01f) );
+    modelMat = glm::rotate( modelMat, 90.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+    modelMat = glm::scale( modelMat, glm::vec3( m_standsize, 0.5f, m_standsize) );
+    tmpStand.modelMat = modelMat;
+
+    m_basketballStandList.push_back(tmpStand);
+
+
+    //backboard
+    m_backboard.Ka = glm::vec3( 1.0f, 1.0f, 1.0f);
+    m_backboard.mass = standmass;
+    m_backboard.vel = standvel;
+    modelMat = glm::mat4(1.0f);
+    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 3.5f, -m_wallsize + 0.5f ) );
+    modelMat = glm::scale( modelMat, glm::vec3( 0.8f ) );
+    m_backboard.modelMat = modelMat;
+    m_backboard.plane.a = 0;
+    m_backboard.plane.b = 0;
+    m_backboard.plane.c = 1;
+    m_backboard.plane.d = m_wallsize - 0.5f;
+
 }
 
 
@@ -307,6 +354,27 @@ void GLWidget::renderBasket()
 }
 
 
+void GLWidget::renderBasketballStand()
+{
+    for(int i = 0; i < m_basketballStandList.size(); i++)
+    {
+        BasketballStand cur_stand = m_basketballStandList[i];
+        glm::vec3 Ka = cur_stand.Ka;
+        glm::mat4 modelMat =cur_stand.modelMat;
+        m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
+        m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
+        m_cylinder->draw();
+    }
+
+    glm::vec3 Ka = m_backboard.Ka;
+    glm::mat4 modelMat =m_backboard.modelMat;
+    m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
+    m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
+    m_quad->draw();
+}
+
+
+
 /**
  * Renders the target and sets its position via setTargetPosition.
  * You have to fill in this method.
@@ -426,6 +494,7 @@ void GLWidget::initializeGL()
     initBasketball();
     initWall();
     initBasket();
+    initBasketballStand();
 
 }
 
@@ -456,6 +525,7 @@ void GLWidget::paintGL()
     renderBasketball();
     renderWall();
     renderBasket();
+    renderBasketballStand();
     //renderRoom();
 
     //Render intersection spheres

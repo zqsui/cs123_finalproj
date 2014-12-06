@@ -17,6 +17,8 @@ Cylinder::Cylinder(int param1, int param2, int param3, const GLuint vertexLocati
     m_n_triangle = 2 * n_top + n_side * m_param2;
 
     auto_compute_m_n(m_n_triangle);
+
+    init(vertexLocation, normalLocation, textureLocation);
     //m_radius = 0.5;
 }
 
