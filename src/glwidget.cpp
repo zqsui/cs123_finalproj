@@ -43,7 +43,8 @@ GLWidget::GLWidget(QWidget *parent)
     m_arrowPos = glm::vec3(0,-3.0f,0);
     m_targetPos = m_arrowPos;
 
-    m_power = 0;
+    m_power = 1;
+
 }
 
 
@@ -54,6 +55,10 @@ GLWidget::~GLWidget()
 
     for(unsigned int i=0;i<m_basketballList.size();i++)
         delete (m_basketballList[i]);
+
+    delete m_quad;
+    delete m_sphere;
+    delete m_torus;
 }
 
 
@@ -90,18 +95,17 @@ void GLWidget::initShapes()
     //initTarget();
 }
 
-void GLWidget::initBasket(){
-    m_basketsize = 0.6;
-
-    m_basket.Ka = glm::vec3( 0.5f, 0.0f, 0.0f);
-    m_basket.mass = 999999;
-    m_basket.vel = glm::vec3(0.0);
+void GLWidget::initHoop(){
+    m_hoopsize = 0.6;
+    m_hoop.Ka = glm::vec3( 0.5f, 0.0f, 0.0f);
+    m_hoop.mass = 999999;
+    m_hoop.vel = glm::vec3(0.0);
 
     glm::mat4 modelMat = glm::mat4(1.0f);
-    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 2.9f, -m_wallsize + m_basketsize * 0.5f + 0.5f) );
-    modelMat = glm::scale( modelMat, glm::vec3( m_basketsize ) );
+    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 2.9f, -m_wallsize + m_hoopsize * 0.5f + 0.55f) );
+    modelMat = glm::scale( modelMat, glm::vec3( m_hoopsize ) );
     modelMat = glm::rotate( modelMat, -90.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
-    m_basket.modelMat = modelMat;
+    m_hoop.modelMat = modelMat;
 }
 
 void GLWidget::initBasketballStand()
@@ -133,17 +137,74 @@ void GLWidget::initBasketballStand()
 
 
     //backboard
-    m_backboard.Ka = glm::vec3( 1.0f, 1.0f, 1.0f);
-    m_backboard.mass = standmass;
-    m_backboard.vel = standvel;
+
+//    m_backboard.Ka = glm::vec3( 1.0f, 1.0f, 1.0f);
+//    m_backboard.mass = standmass;
+//    m_backboard.vel = standvel;
+//    modelMat = glm::mat4(1.0f);
+//    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 3.5f, -m_wallsize + 0.5f ) );
+//    modelMat = glm::scale( modelMat, glm::vec3( 0.8f ) );
+//    m_backboard.modelMat = modelMat;
+//    m_backboard.plane.a = 0;
+//    m_backboard.plane.b = 0;
+//    m_backboard.plane.c = 1;
+//    m_backboard.plane.d = m_wallsize - 0.5f;
+
+
+    // Hoop board
+    // front quad
+    HoopBoard tmpHoopBoard;
+    Plane tmpPlane;
+    glm::vec3 hoop_translation_vec;
+    hoop_translation_vec = glm::vec3( 0.0f, 3.5f, -m_wallsize + 0.55f );
+    glm::vec3 scale_vec = glm::vec3(0.8f);
+
+    tmpHoopBoard.Ka = glm::vec3( 1.0f, 1.0f, 1.0f);
+    tmpHoopBoard.mass = standmass;
+    tmpHoopBoard.vel = standvel;
     modelMat = glm::mat4(1.0f);
-    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 3.5f, -m_wallsize + 0.5f ) );
-    modelMat = glm::scale( modelMat, glm::vec3( 0.8f ) );
-    m_backboard.modelMat = modelMat;
-    m_backboard.plane.a = 0;
-    m_backboard.plane.b = 0;
-    m_backboard.plane.c = 1;
-    m_backboard.plane.d = m_wallsize - 0.5f;
+    modelMat = glm::translate( modelMat, hoop_translation_vec);
+    modelMat = glm::scale( modelMat, scale_vec );
+    tmpHoopBoard.modelMat = modelMat;
+    tmpPlane.a = 0;
+    tmpPlane.b = 0;
+    tmpPlane.c = 1;
+    tmpPlane.d = -hoop_translation_vec.z;//m_wallsize - 0.55f;
+    tmpPlane.normal = glm::vec3(0.0, 0.0, 1.0);
+    tmpPlane.height_vec = glm::vec3(0.0, 1.0, 0.0);
+    tmpPlane.width_vec = glm::vec3(1.0, 0.0, 0.0);
+    tmpPlane.centroid = hoop_translation_vec;
+    tmpPlane.width = scale_vec.x * 2;
+    tmpPlane.height = scale_vec.y * 2;
+    tmpHoopBoard.plane = tmpPlane;
+    tmpHoopBoard.object_type = PRIMITIVE_QUAD;
+    m_hoopBoardList.push_back(tmpHoopBoard);
+
+    // back quad       
+    hoop_translation_vec = glm::vec3( 0.0f, 3.5f, -m_wallsize + 0.5f );
+    tmpHoopBoard.Ka = glm::vec3( 1.0f, 0.0f, 1.0f);
+    tmpHoopBoard.mass = standmass;
+    tmpHoopBoard.vel = standvel;
+    modelMat = glm::mat4(1.0f);
+    modelMat = glm::translate( modelMat, hoop_translation_vec);
+    modelMat = glm::scale( modelMat, scale_vec);
+    modelMat = glm::rotate(modelMat, 180.0f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
+    tmpHoopBoard.modelMat = modelMat;
+    tmpPlane.a = 0;
+    tmpPlane.b = 0;
+    tmpPlane.c = 1;
+    tmpPlane.d = -hoop_translation_vec.z;//m_wallsize - 0.5f;
+    tmpPlane.normal = glm::vec3(0.0, 0.0, -1.0);
+    tmpPlane.height_vec = glm::vec3(0.0, 1.0, 0.0);
+    tmpPlane.width_vec = glm::vec3(-1.0, 0.0, 0.0);
+    tmpPlane.centroid = hoop_translation_vec;
+    tmpPlane.width = scale_vec.x * 2;
+    tmpPlane.height = scale_vec.y * 2;
+    tmpHoopBoard.plane = tmpPlane;
+    tmpHoopBoard.object_type = PRIMITIVE_QUAD;
+    m_hoopBoardList.push_back(tmpHoopBoard);
+
+
 
 }
 
@@ -344,17 +405,17 @@ void GLWidget::renderWall()
     }
 }
 
-void GLWidget::renderBasket()
+void GLWidget::renderHoop()
 {
-    glm::vec3 Ka = m_basket.Ka;
-    glm::mat4 modelMat =m_basket.modelMat;
+    glm::vec3 Ka = m_hoop.Ka;
+    glm::mat4 modelMat =m_hoop.modelMat;
     m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
     m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
     m_torus->draw();
 }
 
 
-void GLWidget::renderBasketballStand()
+void GLWidget::renderStand()
 {
     for(int i = 0; i < m_basketballStandList.size(); i++)
     {
@@ -366,11 +427,31 @@ void GLWidget::renderBasketballStand()
         m_cylinder->draw();
     }
 
-    glm::vec3 Ka = m_backboard.Ka;
-    glm::mat4 modelMat =m_backboard.modelMat;
-    m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
-    m_quad->draw();
+//    glm::vec3 Ka = m_backboard.Ka;
+//    glm::mat4 modelMat =m_backboard.modelMat;
+//    m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
+//    m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
+//    m_quad->draw();
+
+    for(int i = 0; i < m_hoopBoardList.size();i++)
+    {
+        HoopBoard cur_hoopBoard = m_hoopBoardList[i];
+        glm::vec3 Ka = cur_hoopBoard.Ka;
+        glm::mat4 modelMat = cur_hoopBoard.modelMat;
+        m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
+        m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
+        switch (cur_hoopBoard.object_type) {
+        case PRIMITIVE_QUAD:
+            m_quad->draw();
+            break;
+        default:
+            break;
+        }
+//        std::cout<<cur_hoopBoard.plane.centroid.x<<" "<<cur_hoopBoard.plane.centroid.y<<" "<<cur_hoopBoard.plane.centroid.z<<std::endl;
+//        std::cout<<cur_hoopBoard.plane.width<<std::endl;
+//        std::cout<<cur_hoopBoard.plane.height<<std::endl;
+
+    }
 }
 
 
@@ -493,7 +574,7 @@ void GLWidget::initializeGL()
     initShapes();
     initBasketball();
     initWall();
-    initBasket();
+    initHoop();
     initBasketballStand();
 
 }
@@ -524,8 +605,8 @@ void GLWidget::paintGL()
 //    renderArrow();
     renderBasketball();
     renderWall();
-    renderBasket();
-    renderBasketballStand();
+    renderHoop();
+    renderStand();
     //renderRoom();
 
     //Render intersection spheres
@@ -571,11 +652,11 @@ void GLWidget::renderBasketball()
 
         if (!cur_basketball->isFired())
         {
-            glm::vec3 cur_vel = glm::transpose(glm::inverse(glm::mat3x3(basketballModelMat0))) *
-                glm::vec3(0.0, 0.0, -1);
-            cur_vel = cur_vel * 2.0f;
+            glm::vec3 cur_vel = glm::normalize(glm::transpose(glm::inverse(glm::mat3x3(basketballModelMat0))) *
+                glm::vec3(0.0f, 0.0f, -1.0f));
+            float vel_power =(float)cur_basketball->getPower()/3.0f;
+            cur_vel = cur_vel * vel_power;
             cur_basketball->updateVel(cur_vel);
-            //std::cout<<glm::length(cur_vel)<<std::endl;
             cur_basketball->updatePos(cur_pos);
         }
         else
@@ -592,15 +673,7 @@ void GLWidget::renderBasketball()
             basketballModelMat0 = glm::scale(basketballModelMat0, glm::vec3(scale));
 
             processCollision(cur_basketball, i);
-//            if((cur_pos.z - (-5))<EPSILON + scale * 0.5)
-//            {
-//                glm::vec3 ball_vel = cur_basketball->getVel();
-//                glm::vec3 wall_vel = glm::vec3(0.0f);
-//                float ball_mass = cur_basketball->getMass();
-//                float wall_mass = 99999;
-//                momentumTheory(ball_mass, ball_vel, wall_mass, wall_vel, glm::vec3(0.0, 0.0, -1.0f));
-//                cur_basketball->updateVel(ball_vel);
-//            }
+            processScoring(cur_basketball);
 
         }
 
@@ -616,6 +689,11 @@ void GLWidget::renderBasketball()
 }
 
 
+void GLWidget::processScoring(Basketball *cur_basketball)
+{
+
+}
+
 void GLWidget::processCollision(Basketball *cur_basketball, int k)
 {
     for(unsigned int i = k+1;i < m_basketballList.size() - 1;i++)
@@ -624,6 +702,14 @@ void GLWidget::processCollision(Basketball *cur_basketball, int k)
 
     for(unsigned int i = 0; i < m_wallList.size(); i++)
         processCollisionBall2Wall(cur_basketball, m_wallList[i]);
+
+    for(unsigned int i = 0; i < m_hoopBoardList.size();i++)
+    {
+        HoopBoard cur_hoopBoard = m_hoopBoardList[i];
+        processCollisionBall2HoopBoard(cur_basketball, cur_hoopBoard);
+    }
+
+
 }
 
 
@@ -702,6 +788,54 @@ void GLWidget::processCollisionBall2Wall(Basketball *cur_basketball, Wall cur_wa
     }
 }
 
+
+void  GLWidget::processCollisionBall2HoopBoard(Basketball *cur_basketball, HoopBoard cur_hoopBoard)
+{
+    switch(cur_hoopBoard.object_type){
+    case PRIMITIVE_QUAD:
+    {
+        Plane cur_plane = cur_hoopBoard.plane;
+        float dist = point2PlaneDist(cur_basketball->getPos(), cur_plane);
+        if(cur_basketball->getRadius() - dist > EPSILON)
+        {
+          glm::vec3 intersectVerticalPoint =
+                point2PlaneIntersectionPoint(cur_basketball->getPos(), cur_plane, cur_plane.normal);
+          if(isPointInPlane(intersectVerticalPoint, cur_plane))
+          {
+              glm::vec3 dir = -cur_plane.normal;
+              glm::vec3 pos_new = cur_basketball->getPos() -
+                      1.0f * (cur_basketball->getRadius()  - dist) * glm::normalize(dir);
+              cur_basketball->updatePos(pos_new);
+
+              glm::vec3 ball_vel = cur_basketball->getVel();
+              glm::vec3 quad_vel = cur_hoopBoard.vel;
+              float ball_mass = cur_basketball->getMass();
+              float quad_mass = cur_hoopBoard.mass;
+              momentumTheory(ball_mass, ball_vel, quad_mass, quad_vel, dir);
+              float scale_v;
+              float vel_length = glm::length(ball_vel);
+              if(vel_length<0.5)
+                  scale_v = 0;
+              else if(vel_length < 1.5)
+                  scale_v = 0.5;
+              else
+                  scale_v = 0.9;
+              ball_vel *= scale_v;
+              cur_basketball->updateVel(ball_vel);
+          }
+          else
+          {
+              return;
+          }
+        }
+        else
+            return;
+        break;
+    }
+    default:
+        break;
+    }
+}
 
 
 
@@ -1061,23 +1195,35 @@ void GLWidget::keyPressEvent ( QKeyEvent * event )
     }
     if(event->key() == Qt::Key_Space)
     {
-        std::cout << "space press!" << std::endl;
+//        std::cout << "space press!" << std::endl;
         m_power++;
         m_powerSlot->setValue(m_power);
+        Basketball *cur_b = m_basketballList[m_basketballList.size() - 1];
+        cur_b->setPower(m_power);
         update();
     }
 }
 
+
 void GLWidget::keyReleaseEvent ( QKeyEvent * event ){
-    if ( !event->isAutoRepeat() && event->key() == Qt::Key_Space){
-        std::cout << "space release!" << std::endl;
-        m_powerSlot->setValue(m_power);
-        Basketball *cur_b = m_basketballList[m_basketballList.size() - 1];
-        cur_b->fireBasketball();
-        initBasketball();
-        m_power = 0;
-        update();
-    }
+//    if ( !event->isAutoRepeat() && event->key() == Qt::Key_Space){
+//        std::cout << "space release!" << std::endl;
+//        m_powerSlot->setValue(m_power);
+//        Basketball *cur_b = m_basketballList[m_basketballList.size() - 1];
+//        cur_b->fireBasketball();
+//        initBasketball();
+//        m_power = 0;
+//        update();
+//    }
+
+
+//    if (event->key() == Qt::Key_Space)
+//    {
+//        if(event->isAutoRepeat())
+//            std::cout << "autorepeat!" << std::endl;
+////        else
+////            std::cout << "release!" << std::endl;
+//    }
 
 }
 
@@ -1137,14 +1283,24 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 //            m_fired = false;
 //            m_timer.stop();
 //        }
-//        Basketball *cur_b = m_basketballList[m_basketballList.size() - 1];
-//        cur_b->fireBasketball();
-////        m_basketballList[m_basketballList.size() - 1] = cur_b;
-//        initBasketball();
-//        update();
+        Basketball *cur_b = m_basketballList[m_basketballList.size() - 1];
+        cur_b->fireBasketball();
+        initBasketball();
+        m_power = 1;
+        m_powerSlot->setValue(m_power);
+        update();
     }
 
 }
+
+
+//        std::cout << "space release!" << std::endl;
+//        m_powerSlot->setValue(m_power);
+//        Basketball *cur_b = m_basketballList[m_basketballList.size() - 1];
+//        cur_b->fireBasketball();
+//        initBasketball();
+//        m_power = 0;
+//        update();
 
 
 /**
@@ -1181,6 +1337,7 @@ void GLWidget::setLabel(QLabel* label)
 void GLWidget::setProgressBar(QProgressBar *pBar)
 {
     m_powerSlot = pBar;
+    m_powerSlot->setValue(m_power);
 }
 
 

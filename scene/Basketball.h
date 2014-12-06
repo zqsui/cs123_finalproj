@@ -25,6 +25,8 @@ public:
     void fireBasketball();
     void setRadius(float radius);
     float getRadius();
+    void setPower(int power);
+    int getPower();
 
 
 
@@ -37,6 +39,8 @@ private:
      float m_mass;
      bool m_isFired;
      float m_radius;
+
+     int m_power;
 
 };
 

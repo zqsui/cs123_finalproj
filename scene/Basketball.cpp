@@ -85,4 +85,12 @@ float Basketball::getRadius()
     return m_radius;
 }
 
+void Basketball::setPower(int power)
+{
+    m_power = power;
+}
 
+int Basketball::getPower()
+{
+    return m_power;
+}

@@ -18,4 +18,8 @@ glm::vec3 vec4tovec3(glm::vec4 vec4);
 float point2PointDist(glm::vec3 p1, glm::vec3 p2);
 float point2PlaneDist(glm::vec3 point_pos, Plane plane);
 
+glm::vec3 point2PlaneIntersectionPoint(glm::vec3 point_pos, Plane plane, glm::vec3 normal);
+bool isPointInPlane(glm::vec3 point_pos, Plane plane);
+void printVec3(glm::vec3 vec3);
+
 #endif // UTILS_H

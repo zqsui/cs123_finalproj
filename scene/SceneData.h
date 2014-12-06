@@ -4,9 +4,24 @@
 #include <GL/gl.h>
 #include "glm/glm/glm.hpp"
 
+enum PrimitiveType {
+    PRIMITIVE_CUBE,
+    PRIMITIVE_CONE,
+    PRIMITIVE_CYLINDER,
+    PRIMITIVE_TORUS,
+    PRIMITIVE_SPHERE,
+    PRIMITIVE_QUAD
+};
+
 
 struct Plane{
-    float a, b, c, d;
+    float a, b, c, d;    
+    float width;
+    float height;
+    glm::vec3 width_vec;
+    glm::vec3 height_vec;
+    glm::vec3 normal;
+    glm::vec3 centroid;
 };
 
 
@@ -19,16 +34,14 @@ struct Wall{
     float mass;
     glm::vec3 vel;
     glm::vec3 normal;
-    Plane plane;
+    Plane plane;    
 };
 
-struct Basket{
+struct Hoop{
     glm::vec3 Ka;
     glm::mat4 modelMat;
     float mass;
     glm::vec3 vel;
-    glm::vec3 normal;
-    Plane plane;
 };
 
 struct BasketballStand{
@@ -46,8 +59,19 @@ struct BackBoard{
     float mass;
     glm::vec3 vel;
     glm::vec3 normal;
+    Plane plane;    
+};
+
+struct HoopBoard
+{
+    glm::vec3 Ka;
+    glm::mat4 modelMat;
+    float mass;
+    glm::vec3 vel;
+    int object_type;
     Plane plane;
 };
+
 
 
 

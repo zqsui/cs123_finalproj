@@ -1,7 +1,7 @@
 #include <math.h>
 #include "utils.h"
 #include "glm/glm/glm.hpp"
-
+#include <iostream>
 
 
 int sub2ind(int width, int row, int col)
@@ -49,4 +49,52 @@ float point2PlaneDist(glm::vec3 point_pos, Plane plane)
 float point2PointDist(glm::vec3 p1, glm::vec3 p2)
 {
     return glm::length(p1 - p2);
+}
+
+glm::vec3 point2PlaneIntersectionPoint(glm::vec3 point_pos, Plane plane, glm::vec3 normal)
+{
+    float dist = point2PlaneDist(point_pos, plane);
+    return point_pos + dist * (-normal);
+}
+
+
+bool isPointInPlane(glm::vec3 point_pos, Plane plane)
+{
+    glm::vec3 plane_params = glm::vec3(plane.a, plane.b, plane.c);
+    if(!EQ(glm::dot(point_pos, plane_params)+plane.d, 0))
+    {
+//        std::cout<<"not on plane"<<std::endl;
+        return false;
+    }
+    else
+    {
+        glm::vec3 centroid = plane.centroid;
+        float width = plane.width;
+        float height = plane.height;
+        glm::vec3 offset = point_pos - centroid;
+        float width_projection = fabs(glm::dot(offset, plane.width_vec));
+        float height_projection = fabs(glm::dot(offset, plane.height_vec));
+
+//        printVec3(point_pos);
+//        printVec3(plane.centroid);
+//        printVec3(offset);
+//        std::cout<<width<<" "<<height<<std::endl;
+        if((width/2 - width_projection > EPSILON)&&(height/2 - height_projection > EPSILON))
+        {
+//            std::cout<<"on plane!"<<std::endl;
+            return true;
+        }
+        else
+        {
+//            std::cout<<"on plane, but out of bounds"<<std::endl;
+            return false;
+        }
+    }
+}
+
+
+
+void printVec3(glm::vec3 vec3)
+{
+    std::cout<<vec3.x<<" "<<vec3.y<<" "<<vec3.z<<std::endl;
 }

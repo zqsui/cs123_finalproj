@@ -47,7 +47,6 @@ protected:
     void keyPressEvent ( QKeyEvent * event );
     void mouseMoveEvent ( QMouseEvent * event );
     void mousePressEvent ( QMouseEvent * event );
-
     void keyReleaseEvent ( QKeyEvent * event );
 
 protected slots:
@@ -61,7 +60,7 @@ private:
 
     void initBasketball();
     void initWall();
-    void initBasket();
+    void initHoop();
     void initBasketballStand();
 
     // Rendering methods.
@@ -73,13 +72,14 @@ private:
     void renderBow();
     void renderQuad();
     void renderWall();
-    void renderBasket();
-    void renderBasketballStand();
+    void renderHoop();
+    void renderStand();
 
     void processCollision(Basketball *cur_basketball, int k);
     void processCollisionBall2Ball(Basketball *basketball_1, Basketball *basketball_2);
     void processCollisionBall2Wall(Basketball *cur_basketball, Wall cur_wall);
-
+    void processCollisionBall2HoopBoard(Basketball *cur_basketball, HoopBoard cur_hoopBoard);
+    void processScoring(Basketball *cur_basketball);
 
     void renderBasketball();
 
@@ -131,7 +131,7 @@ private:
     bool m_canCollide;
     int m_n_all;
     float m_wallsize;
-    float m_basketsize;
+    float m_hoopsize;
     float m_standsize;
 
     GLuint m_vaoID;
@@ -149,8 +149,9 @@ private:
     std::vector<Wall> m_wallList;
     std::vector<BasketballStand> m_basketballStandList;
 
-    Basket m_basket;
+    Hoop m_hoop;
     BackBoard m_backboard;
+    std::vector<HoopBoard> m_hoopBoardList;
 
 };
 
