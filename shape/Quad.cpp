@@ -19,7 +19,7 @@ Quad::Quad(Shader &shader)
    GLfloat vertexData[] = {
        -rad, -rad, 0,
        0, 0, 1,
-       0, 0,
+       1, 1,
        rad, -rad, 0,
        0, 0, 1,
        1, 0,
@@ -27,7 +27,7 @@ Quad::Quad(Shader &shader)
        0, 0, 1,
        0, 1,
        rad, rad, 0,
-       1, 1
+       0, 0
    };
 
 

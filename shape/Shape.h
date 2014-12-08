@@ -22,6 +22,10 @@ public:
     virtual void insert2vertexData_tri(int index, glm::vec3 vertexCoord1, glm::vec3 vertexCoord2,glm::vec3 vertexCoord3);
     virtual void insert2vertexData_rec(int index, glm::vec3 top_right, glm::vec3 top_left,glm::vec3 bottom_left,glm::vec3 bottom_right);
 
+    virtual void insert2vertexData2(int index, glm::vec2 vertexCoord);
+    virtual void insert2vertexData_tri2(int index, glm::vec2 vertexCoord1, glm::vec2 vertexCoord2,glm::vec2 vertexCoord3);
+    virtual void insert2vertexData_rec2(int index, glm::vec2 top_right, glm::vec2 top_left,glm::vec2 bottom_left,glm::vec2 bottom_right);
+
     virtual float getIntersect(glm::vec4 eye_pos, glm::vec4 ray_dir) = 0; //{return INFINITY;}
     virtual glm::vec4 getShapeNormal(glm::vec4 intersect_point) = 0; //{return glm::vec4(1.0, 0.0, 0.0, 0.0);}
     virtual glm::vec2 getShapeUV(glm::vec4 intersect_point) = 0;

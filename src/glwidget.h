@@ -137,6 +137,8 @@ private:
     GLuint m_vaoID;
     GLuint m_vboID;
     GLuint m_textureId;
+    GLuint m_basketballTextureId;
+    GLuint m_boardId;
 
     glm::vec3 arrow_vel;
 

@@ -17,6 +17,7 @@ Cylinder::Cylinder(int param1, int param2, int param3, const GLuint vertexLocati
     m_n_triangle = 2 * n_top + n_side * m_param2;
 
     auto_compute_m_n(m_n_triangle);
+    m_n_vertexData += m_n_triangle * 3 * 2;
 
     init(vertexLocation, normalLocation, textureLocation);
     //m_radius = 0.5;
@@ -57,6 +58,13 @@ void Cylinder::init(const GLuint vertexLocation, const GLuint normalLocation, co
     glm::vec3 cur_norm;
     glm::vec3 next_norm;
 
+    glm::vec2 tex_top;
+    glm::vec2 tex_bottom;
+    glm::vec2 tex_lower_right;
+    glm::vec2 tex_lower_left;
+    glm::vec2 tex_top_right;
+    glm::vec2 tex_top_left;
+
 
     float cur_theta, next_theta, theta_bottom;
     theta_bottom = 2.0 * M_PI / m_param2;
@@ -81,9 +89,16 @@ void Cylinder::init(const GLuint vertexLocation, const GLuint normalLocation, co
         lower_left = glm::vec3(radius_bottom * cos(cur_theta), const_coord, radius_bottom * sin(cur_theta));
         lower_right = glm::vec3(radius_bottom * cos(next_theta), const_coord, radius_bottom * sin(next_theta));
 
+        tex_bottom = getShapeUV(glm::vec4(vertexBottom, 1.0f));
+        tex_lower_left = getShapeUV(glm::vec4(lower_left, 1.0f));
+        tex_lower_right = getShapeUV(glm::vec4(lower_right, 1.0f));
+
+
         insert2vertexData_tri(index, vertexBottom, lower_left, lower_right);
         insert2vertexData_tri(index + 3, norm_bottom, norm_bottom, norm_bottom);
-        index += 18;
+        insert2vertexData_tri2(index + 6, tex_bottom, tex_lower_left, tex_lower_right);
+        //index += 18;
+        index += 24;
 
         for(j = 1; j< m_param1; j++)
         {
@@ -95,9 +110,17 @@ void Cylinder::init(const GLuint vertexLocation, const GLuint normalLocation, co
             lower_left = glm::vec3(cur_radius * cos(next_theta), const_coord, cur_radius * sin(next_theta));
             lower_right = glm::vec3(cur_radius * cos(cur_theta), const_coord, cur_radius * sin(cur_theta));
 
+            tex_top_right = getShapeUV(glm::vec4(top_right, 1.0f));
+            tex_top_left = getShapeUV(glm::vec4(top_left, 1.0f));
+            tex_lower_left = getShapeUV(glm::vec4(lower_left, 1.0f));
+            tex_lower_right = getShapeUV(glm::vec4(lower_right, 1.0f));
+
+
             insert2vertexData_rec(index, top_right, top_left, lower_left, lower_right);
             insert2vertexData_rec(index + 3, norm_bottom, norm_bottom, norm_bottom, norm_bottom);
-            index += 36;
+            insert2vertexData_rec2(index + 6, tex_top_right, tex_top_left, tex_lower_left, tex_lower_right);
+            //index += 36;
+            index += 48;
         }
     }
 
@@ -110,9 +133,16 @@ void Cylinder::init(const GLuint vertexLocation, const GLuint normalLocation, co
         lower_right = glm::vec3(radius_bottom * cos(cur_theta), const_coord, radius_bottom * sin(cur_theta));
         lower_left = glm::vec3(radius_bottom * cos(next_theta), const_coord, radius_bottom * sin(next_theta));
 
+        tex_top = getShapeUV(glm::vec4(vertexTop, 1.0f));
+        tex_lower_left = getShapeUV(glm::vec4(lower_left, 1.0f));
+        tex_lower_right = getShapeUV(glm::vec4(lower_right, 1.0f));
+
+
         insert2vertexData_tri(index, vertexTop, lower_left, lower_right);
         insert2vertexData_tri(index + 3, norm_top, norm_top, norm_top);
-        index += 18;
+        insert2vertexData_tri2(index + 6, tex_top, tex_lower_left, tex_lower_right);
+        //index += 18;
+        index += 24;
 
         for(j = 1; j < m_param1; j++)
         {
@@ -124,9 +154,17 @@ void Cylinder::init(const GLuint vertexLocation, const GLuint normalLocation, co
             top_left = glm::vec3(cur_radius * cos(next_theta), const_coord, cur_radius * sin(next_theta));
             top_right = glm::vec3(cur_radius * cos(cur_theta), const_coord, cur_radius * sin(cur_theta));
 
+            tex_top_right = getShapeUV(glm::vec4(top_right, 1.0f));
+            tex_top_left = getShapeUV(glm::vec4(top_left, 1.0f));
+            tex_lower_left = getShapeUV(glm::vec4(lower_left, 1.0f));
+            tex_lower_right = getShapeUV(glm::vec4(lower_right, 1.0f));
+
+
             insert2vertexData_rec(index, top_right, top_left, lower_left, lower_right);
             insert2vertexData_rec(index + 3, norm_top, norm_top, norm_top, norm_top);
-            index += 36;
+            insert2vertexData_rec2(index+6, tex_top_right, tex_top_left, tex_lower_left, tex_lower_right);
+            //index += 36;
+            index += 48;
         }
     }
 
@@ -149,10 +187,17 @@ void Cylinder::init(const GLuint vertexLocation, const GLuint normalLocation, co
             lower_left = glm::vec3(m_radius * cos(next_theta), cur_y, m_radius * sin(next_theta));
             lower_right = glm::vec3(m_radius * cos(cur_theta), cur_y, m_radius * sin(cur_theta));
 
+            tex_top_right = getShapeUV(glm::vec4(top_right, 1.0f));
+            tex_top_left = getShapeUV(glm::vec4(top_left, 1.0f));
+            tex_lower_left = getShapeUV(glm::vec4(lower_left, 1.0f));
+            tex_lower_right = getShapeUV(glm::vec4(lower_right, 1.0f));
+
             insert2vertexData_rec(index, top_right, top_left, lower_left, lower_right);
             insert2vertexData_rec(index + 3, cur_norm, next_norm, next_norm, cur_norm);
+            insert2vertexData_rec2(index+6, tex_top_right, tex_top_left, tex_lower_left, tex_lower_right);
 
-            index += 36;
+            //index += 36;
+            index += 48;
         }
     }
 
@@ -169,7 +214,7 @@ void Cylinder::init(const GLuint vertexLocation, const GLuint normalLocation, co
         3,                   // Num coordinates per position
         GL_FLOAT,            // Type
         GL_FALSE,            // Normalized
-        sizeof(GLfloat) * 6, // Stride
+        sizeof(GLfloat) * 8, // Stride
         (void*) 0            // Array buffer offset
     );
 
@@ -179,10 +224,19 @@ void Cylinder::init(const GLuint vertexLocation, const GLuint normalLocation, co
         3,           // Num coordinates per normal
         GL_FLOAT,    // Type
         GL_TRUE,     // Normalized
-        sizeof(GLfloat) * 6,           // Stride
+        sizeof(GLfloat) * 8,           // Stride
         (void*) (sizeof(GLfloat) * 3)    // Array buffer offset
     );
 
+    glEnableVertexAttribArray(textureLocation);
+    glVertexAttribPointer(
+        textureLocation,
+        2,           // Num coordinates per normal
+        GL_FLOAT,    // Type
+        GL_FALSE,
+        sizeof(GLfloat) * 8,           // Stride
+        (void*) (sizeof(GLfloat) * 6)    // Array buffer offset
+    );
 
 
     // Unbind buffers.

@@ -157,9 +157,9 @@ void GLWidget::initBasketballStand()
     Plane tmpPlane;
     glm::vec3 hoop_translation_vec;
     hoop_translation_vec = glm::vec3( 0.0f, 3.5f, -m_wallsize + 0.55f );
-    glm::vec3 scale_vec = glm::vec3(0.8f);
+    glm::vec3 scale_vec = glm::vec3(1.17f, 0.8f, 1.0f);
 
-    tmpHoopBoard.Ka = glm::vec3( 1.0f, 1.0f, 1.0f);
+    tmpHoopBoard.Ka = glm::vec3( 0.5f);
     tmpHoopBoard.mass = standmass;
     tmpHoopBoard.vel = standvel;
     modelMat = glm::mat4(1.0f);
@@ -182,7 +182,7 @@ void GLWidget::initBasketballStand()
 
     // back quad       
     hoop_translation_vec = glm::vec3( 0.0f, 3.5f, -m_wallsize + 0.5f );
-    tmpHoopBoard.Ka = glm::vec3( 1.0f, 0.0f, 1.0f);
+    tmpHoopBoard.Ka = glm::vec3( 0.5f);
     tmpHoopBoard.mass = standmass;
     tmpHoopBoard.vel = standvel;
     modelMat = glm::mat4(1.0f);
@@ -306,11 +306,11 @@ void GLWidget::initWall()
    m_wallList.push_back(tmpWall);
 
    //ground
-   Ka = glm::vec3(0.3f, 0.74f, 0.2f);
+   Ka = glm::vec3(0.0f);
    m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
    modelMat = glm::mat4(1.0f);
    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 0.0f, 0.0f ) );
-   modelMat = glm::scale( modelMat, glm::vec3( m_wallsize) );
+   modelMat = glm::scale( modelMat, glm::vec3( m_wallsize, m_wallsize, m_wallsize) );
    modelMat = glm::rotate(modelMat, -90.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
    tmpWall.Ka =  Ka;
    tmpWall.modelMat = modelMat;
@@ -401,8 +401,16 @@ void GLWidget::renderWall()
         glm::mat4 modelMat =cur_wall.modelMat;
         m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
         m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
-        m_quad->draw();
+        if ( i == (m_wallList.size() - 1)){
+            glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
+            m_shader.setUniform("textureSampler", Shader::INT, 0);
+            glBindTexture(GL_TEXTURE_2D, m_textureId);
+            m_quad->draw();
+            glBindTexture(GL_TEXTURE_2D, 0);
+         }
+        else m_quad->draw();
     }
+
 }
 
 void GLWidget::renderHoop()
@@ -442,7 +450,11 @@ void GLWidget::renderStand()
         m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
         switch (cur_hoopBoard.object_type) {
         case PRIMITIVE_QUAD:
+            glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
+            m_shader.setUniform("textureSampler", Shader::INT, 0);
+            glBindTexture(GL_TEXTURE_2D, m_boardId);
             m_quad->draw();
+            glBindTexture(GL_TEXTURE_2D, 0);
             break;
         default:
             break;
@@ -559,7 +571,9 @@ void GLWidget::initializeGL()
     m_shader.compile();
     m_shader.use();
 
-    m_textureId = m_shader.loadTexture("../cs123_finalproj/textures/particle3.jpg");
+    m_textureId = m_shader.loadTexture("../cs123_finalproj/textures/basketball_court2.jpg");
+    m_basketballTextureId = m_shader.loadTexture("../cs123_finalproj/textures/BasketballColor.jpg");
+    m_boardId = m_shader.loadTexture("../cs123_finalproj/textures/Board2.jpg");
 
     // Set lighting properties.
     glm::vec3 La = glm::vec3( 0.2f, 0.2f, 0.2f );
@@ -603,7 +617,13 @@ void GLWidget::paintGL()
 //    renderBow();
 
 //    renderArrow();
+
+    glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
+    m_shader.setUniform("textureSampler", Shader::INT, 0);
+    glBindTexture(GL_TEXTURE_2D, m_basketballTextureId);
     renderBasketball();
+    glBindTexture(GL_TEXTURE_2D, 0);
+
     renderWall();
     renderHoop();
     renderStand();
@@ -678,13 +698,14 @@ void GLWidget::renderBasketball()
         }
 
 
-        glm::vec3 Ka = glm::vec3( 1.0f, 0.0f, 0.0f );
+        glm::vec3 Ka = glm::vec3(0.5f);
         m_shader.setUniform( "Ka", Shader::VEC3, &Ka );
         m_shader.setUniform( "M_Matrix", Shader::MAT4, &basketballModelMat0[ 0 ][ 0 ] );
 
 
-        if(!cur_basketball->isDisappeared())
+        if(!cur_basketball->isDisappeared()){
             m_sphere->draw();
+        }
     }
 }
 

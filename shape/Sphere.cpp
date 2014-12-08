@@ -693,6 +693,7 @@ Sphere::Sphere(int param1, int param2, int param3, const GLuint vertexLocation, 
     int n_per_slice = 2* m_param1 - 2;
     m_n_triangle = n_per_slice * m_param2;
     auto_compute_m_n(m_n_triangle);
+    m_n_vertexData += m_n_triangle * 3 * 2;
     //m_radius = 0.5;
     init(vertexLocation, normalLocation, textureLocation);
 }
@@ -716,7 +717,6 @@ void Sphere::init(const GLuint vertexLocation, const GLuint normalLocation, cons
     glGenBuffers(1, &m_vboID);
     glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
 
-
     m_vertexData = new GLfloat[m_n_vertexData];
 
     float phi = 1.0 * M_PI / m_param1;
@@ -738,6 +738,13 @@ void Sphere::init(const GLuint vertexLocation, const GLuint normalLocation, cons
     glm::vec3 norm_top_right;
     glm::vec3 norm_top_left;
 
+    glm::vec2 tex_top;
+    glm::vec2 tex_bottom;
+    glm::vec2 tex_lower_right;
+    glm::vec2 tex_lower_left;
+    glm::vec2 tex_top_right;
+    glm::vec2 tex_top_left;
+
     int index;
     int i, j;
     float cur_theta, next_theta, cur_phi, next_phi, phi_bottom;
@@ -746,7 +753,7 @@ void Sphere::init(const GLuint vertexLocation, const GLuint normalLocation, cons
     {
         cur_theta = i * theta;
         next_theta = (i + 1) * theta;
-        index = i * n_per_slice * 3 * 3 * 2;
+        index = i * n_per_slice * 3 * ( 3 * 2 + 2 );
 
         // triangle on top
         lower_right = getSphereCoord(cur_theta, phi);
@@ -755,11 +762,18 @@ void Sphere::init(const GLuint vertexLocation, const GLuint normalLocation, cons
         norm_lower_right = getSphereNorm(cur_theta, phi);
         norm_lower_left = getSphereNorm(next_theta, phi);
 
+        tex_top = getShapeUV(glm::vec4(vertexTop, 1.0f));
+        tex_lower_right = getShapeUV(glm::vec4(lower_right, 1.0f));
+        tex_lower_left = getShapeUV(glm::vec4(lower_left, 1.0f));
+
         insert2vertexData_tri(index, vertexTop, lower_left, lower_right);
         insert2vertexData_tri(index+3, norm_top, norm_lower_left, norm_lower_right);
+        insert2vertexData_tri2(index+6, tex_top, tex_lower_left, tex_lower_right);
+
+
 
         // triangle on bottom
-        index += 3 * 3 * 2;
+        index += 3 * ( 3 * 2 + 2);
 
         phi_bottom = M_PI - phi;
 
@@ -769,10 +783,16 @@ void Sphere::init(const GLuint vertexLocation, const GLuint normalLocation, cons
         norm_top_right = getSphereNorm(cur_theta, phi_bottom);
         norm_top_left = getSphereNorm(next_theta, phi_bottom);
 
+        tex_bottom = getShapeUV(glm::vec4(vertexBottom, 1.0f));
+        tex_top_right = getShapeUV(glm::vec4(top_right, 1.0f));
+        tex_top_left = getShapeUV(glm::vec4(top_left, 1.0f));
+
         insert2vertexData_tri(index, vertexBottom, top_right, top_left);
         insert2vertexData_tri(index+3, norm_bottom, norm_top_right, norm_top_left);
+        insert2vertexData_tri2(index+6, tex_bottom, tex_top_right, tex_top_left);
 
-        index += 3 * 3 * 2;
+
+        index += 3 * (3 * 2 + 2);
 
         for(j = 1; j< (m_param1-1); j++)
         {
@@ -788,9 +808,18 @@ void Sphere::init(const GLuint vertexLocation, const GLuint normalLocation, cons
             norm_lower_left = getSphereNorm(next_theta, next_phi);
             norm_lower_right = getSphereNorm(cur_theta, next_phi);
 
+            tex_top_right = getShapeUV(glm::vec4(top_right, 1.0f));
+            tex_top_left = getShapeUV(glm::vec4(top_left, 1.0f));
+            tex_lower_left = getShapeUV(glm::vec4(lower_left, 1.0f));
+            tex_lower_right = getShapeUV(glm::vec4(lower_right, 1.0f));
+
+
             insert2vertexData_rec(index, top_right, top_left, lower_left, lower_right);
             insert2vertexData_rec(index+3, norm_top_right, norm_top_left, norm_lower_left, norm_lower_right);
-            index += 3 * 3 * 2 * 2;
+            insert2vertexData_rec2(index+6, tex_top_right, tex_top_left, tex_lower_left, tex_lower_right);
+
+
+            index += 3 * ( 3 * 2  + 2 )* 2;
         }
     }
 
@@ -808,7 +837,7 @@ void Sphere::init(const GLuint vertexLocation, const GLuint normalLocation, cons
        3,                   // Num coordinates per position
        GL_FLOAT,            // Type
        GL_FALSE,            // Normalized
-       sizeof(GLfloat) * 6, // Stride
+       sizeof(GLfloat) * 8, // Stride
        (void*) 0            // Array buffer offset
    );
 
@@ -818,8 +847,18 @@ void Sphere::init(const GLuint vertexLocation, const GLuint normalLocation, cons
        3,           // Num coordinates per normal
        GL_FLOAT,    // Type
        GL_TRUE,     // Normalized
-       sizeof(GLfloat) * 6,           // Stride
+       sizeof(GLfloat) * 8,           // Stride
        (void*) (sizeof(GLfloat) * 3)    // Array buffer offset
+   );
+
+   glEnableVertexAttribArray(textureLocation);
+   glVertexAttribPointer(
+       textureLocation,
+       2,           // Num coordinates per normal
+       GL_FLOAT,    // Type
+       GL_FALSE,
+       sizeof(GLfloat) * 8,           // Stride
+       (void*) (sizeof(GLfloat) * 6)    // Array buffer offset
    );
 
 
