@@ -106,6 +106,39 @@ void GLWidget::initHoop(){
     modelMat = glm::scale( modelMat, glm::vec3( m_hoopsize ) );
     modelMat = glm::rotate( modelMat, -90.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
     m_hoop.modelMat = modelMat;
+
+    //
+    glm::vec3 torus_center =glm::vec3(glm::translate(glm::mat4(1.0f),
+                                           glm::vec3( 0.0f, 2.9f, -m_wallsize + m_hoopsize * 0.5f + 0.55f) )
+                                    * glm::vec4(0.0, 0.0, 0.0, 1.0));
+
+
+    //printVec3(torus_center);
+    Plane tmpPlane;
+    tmpPlane.a = 0.0;
+    tmpPlane.b = 0.0;
+    tmpPlane.c = 1.0;
+    tmpPlane.d = -(-m_wallsize + m_hoopsize * 0.5f + 0.55f + 0.5f * m_hoopsize);
+    modelMat = glm::mat4(1.0f);
+    modelMat = glm::translate(modelMat, torus_center + glm::vec3(0.0, 0.0, 0.5f*m_hoopsize));
+    modelMat = glm::scale(modelMat, glm::vec3(m_hoopsize *0.5f, 0.05*m_hoopsize, 1.0));
+    tmpPlane.width = 1.0f*m_hoopsize;
+    tmpPlane.height = 0.05 * m_hoopsize;
+    tmpPlane.centroid = torus_center + glm::vec3(0.0, 0.0, 0.5f*m_hoopsize);
+    tmpPlane.normal = glm::vec3(0.0, 0.0, 1.0);
+    tmpPlane.modelMat = modelMat;
+
+    m_hoop.plane.push_back(tmpPlane);
+
+//    struct Plane{
+//        float a, b, c, d;
+//        float width;
+//        float height;
+//        glm::vec3 width_vec;
+//        glm::vec3 height_vec;
+//        glm::vec3 normal;
+//        glm::vec3 centroid;
+//    };
 }
 
 void GLWidget::initBasketballStand()
@@ -420,12 +453,22 @@ void GLWidget::renderHoop()
     m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
     m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
     m_torus->draw();
+
+
+//    for(unsigned int i = 0; i< m_hoop.plane.size();i++)
+//    {
+//        Plane cur_plane = m_hoop.plane[i];
+//        modelMat = cur_plane.modelMat;
+//        m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
+//        m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
+//        m_quad->draw();
+//    }
 }
 
 
 void GLWidget::renderStand()
 {
-    for(int i = 0; i < m_basketballStandList.size(); i++)
+    for(unsigned int i = 0; i < m_basketballStandList.size(); i++)
     {
         BasketballStand cur_stand = m_basketballStandList[i];
         glm::vec3 Ka = cur_stand.Ka;

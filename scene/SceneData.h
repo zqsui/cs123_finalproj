@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include "glm/glm/glm.hpp"
+#include <vector>
 
 enum PrimitiveType {
     PRIMITIVE_CUBE,
@@ -22,6 +23,7 @@ struct Plane{
     glm::vec3 height_vec;
     glm::vec3 normal;
     glm::vec3 centroid;
+    glm::mat4 modelMat;
 };
 
 
@@ -42,6 +44,7 @@ struct Hoop{
     glm::mat4 modelMat;
     float mass;
     glm::vec3 vel;
+    std::vector<Plane> plane;
 };
 
 struct BasketballStand{
