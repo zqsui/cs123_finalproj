@@ -4,7 +4,7 @@
 #include "GL/glew.h"
 #include "glm/glm/glm.hpp"
 
-#define GRAVITY 9.8
+#define GRAVITY 13.8
 
 class Basketball
 {
@@ -19,6 +19,7 @@ public:
     void updateEnergy();
     glm::vec3 getPos();
     glm::vec3 getVel();
+    void setScored();
     float getMass();
     void updateVel(glm::vec3 vel);
     void updatePos(glm::vec3 pos);
@@ -27,6 +28,9 @@ public:
     float getRadius();
     void setPower(int power);
     int getPower();
+    void setDisappear();
+    void updateSpin(int spin);
+    int getSpin();
 
 
 
@@ -41,6 +45,7 @@ private:
      float m_radius;
 
      int m_power;
+     int m_spin;
 
 };
 

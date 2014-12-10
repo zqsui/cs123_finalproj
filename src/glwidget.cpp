@@ -576,7 +576,7 @@ void GLWidget::initializeGL()
     m_boardId = m_shader.loadTexture("../cs123_finalproj/textures/Board2.jpg");
 
     // Set lighting properties.
-    glm::vec3 La = glm::vec3( 0.2f, 0.2f, 0.2f );
+    glm::vec3 La = glm::vec3( 0.8f, 0.8f, 0.8f );
     m_shader.setUniform( "La", Shader::VEC3, &La );
 
     glm::vec3 Lpos = glm::vec3( 1.0f, 1.0f, 1.0f );
@@ -678,9 +678,25 @@ void GLWidget::renderBasketball()
             cur_vel = cur_vel * vel_power;
             cur_basketball->updateVel(cur_vel);
             cur_basketball->updatePos(cur_pos);
+
+//            std::cout<<vel_power<<std::endl;
+//            glm::vec3 rotate_axis = glm::cross(cur_vel, glm::vec3(0.0, -1.0, 0.0));
+
+//            std::cout<<"---"<<std::endl;
+//            printMatrix(basketballModelMat0);
+//            basketballModelMat0 = m_camera.getRotation(glm::vec4(cur_pos, 0.0), glm::vec4(rotate_axis, 0.0),
+//                                                       10 * glm::length(cur_vel)) * basketballModelMat0;
+//            printMatrix(basketballModelMat0);
+//            glm::mat4 tmp = m_camera.getRotation(glm::vec4(cur_pos, 0.0), glm::vec4(rotate_axis, 0.0),
+//                                                 10 * glm::length(cur_vel));
+
+//            printMatrix(tmp);
+
+
+            // printVec3(cur_pos);
         }
-        else
-        {
+        else if(!cur_basketball->isDisappeared())
+        {            
             glm::vec3 accel = glm::vec3(0.0, -GRAVITY, 0.0);
             glm::vec3 next_vel = accelVel(cur_basketball->getVel(), accel, delta_t);
             glm::vec3 delta_s = computeDisplacement(cur_basketball->getVel(),
@@ -689,16 +705,41 @@ void GLWidget::renderBasketball()
             cur_basketball->updateVel(next_vel);
             cur_basketball->updatePos(cur_pos);
             //cur_pos = cur_basketball->getPos() + cur_basketball->getVel() * delta_t;
-            basketballModelMat0 = glm::translate(glm::mat4(1.0f), cur_pos);
+
+            glm::vec3 rotate_axis = glm::cross(next_vel, glm::vec3(0.0, -1.0, 0.0));
+
+            basketballModelMat0 = glm::mat4(1.0f);
+//            basketballModelMat0 = glm::translate(glm::mat4(1.0f), cur_pos);
+//            basketballModelMat0 = glm::rotate(basketballModelMat0, glm::length(next_vel), rotate_axis);
+
+            basketballModelMat0 = glm::translate(basketballModelMat0, cur_pos);
             basketballModelMat0 = glm::scale(basketballModelMat0, glm::vec3(scale));
+            float cur_spin;
+//            if(glm::length(cur_basketball->getVel()) > 5)
+                cur_spin = -1.0f * (float)cur_basketball->getSpin()/10.0f;// * glm::length(cur_basketball->getVel());
+//            else
+//                cur_spin = 0;
+//            std::cout<<cur_spin<<std::endl;
+            basketballModelMat0 = m_camera.getRotation(glm::vec4(cur_pos, 0.0), glm::vec4(rotate_axis, 0.0),
+                                              cur_spin) * basketballModelMat0;
+            cur_basketball->updateSpin(cur_basketball->getSpin() + 1);
+
 
             processCollision(cur_basketball, i);
-            processScoring(cur_basketball);
 
+            if(!cur_basketball->isScored())
+                processScoring(cur_basketball);
+
+            if(EQ(glm::length(cur_basketball->getVel()), 0))
+                cur_basketball->setDisappear();
+        }
+        else
+        {
+            // If disappeared, do nothing;
         }
 
 
-        glm::vec3 Ka = glm::vec3(0.5f);
+        glm::vec3 Ka = glm::vec3(0.2f);
         m_shader.setUniform( "Ka", Shader::VEC3, &Ka );
         m_shader.setUniform( "M_Matrix", Shader::MAT4, &basketballModelMat0[ 0 ][ 0 ] );
 
@@ -712,13 +753,36 @@ void GLWidget::renderBasketball()
 
 void GLWidget::processScoring(Basketball *cur_basketball)
 {
+    glm::vec3 hoop_pos = glm::vec3(m_hoop.modelMat * glm::vec4(0.0, 0.0, 0.0, 1.0));
+    glm::vec3 cur_pos = cur_basketball->getPos();
+    if((point2PointDist(hoop_pos, cur_pos) < m_hoopsize - 0.05)
+            && fabs(cur_pos.y - hoop_pos.y) < 0.1)
+    {
+        glm::vec3 cur_vel = cur_basketball->getVel();
+        cur_vel.x = 0.5 * rand()/RAND_MAX;
+        cur_vel.z = 0.5 * rand()/RAND_MAX;
+        cur_basketball->updateVel(cur_vel);
+        cur_basketball->setScored();
 
+        m_scoreLabel->setText("Score: " + QString::number(++m_score));
+        m_hoopBoardList[0].Ka = glm::vec3(1.0 * rand()/RAND_MAX, 1.0 * rand()/RAND_MAX, 1.0 * rand()/RAND_MAX);
+
+
+//        std::cout<<"score"<<std::endl;
+//        printVec3(hoop_pos);
+//        printVec3(cur_basketball->getPos());
+//        std::cout<<point2PointDist(hoop_pos, cur_basketball->getPos())<<std::endl;
+    }
 }
 
 void GLWidget::processCollision(Basketball *cur_basketball, int k)
 {
     for(unsigned int i = k+1;i < m_basketballList.size() - 1;i++)
-        processCollisionBall2Ball(cur_basketball, m_basketballList[i]);
+    {
+        Basketball *tmp = m_basketballList[i];
+        if(!tmp->isDisappeared())
+            processCollisionBall2Ball(cur_basketball, m_basketballList[i]);
+    }
 
 
     for(unsigned int i = 0; i < m_wallList.size(); i++)
@@ -792,9 +856,9 @@ void GLWidget::processCollisionBall2Wall(Basketball *cur_basketball, Wall cur_wa
 //        std::cout<<glm::length(ball_vel)<<std::endl;
         float scale_v;
         float vel_length = glm::length(ball_vel);
-        if(vel_length<0.5)
+        if(vel_length<1.5)
             scale_v = 0;
-        else if(vel_length < 1.5)
+        else if(vel_length < 2)
             scale_v = 0.5;
         else
             scale_v = 0.9;

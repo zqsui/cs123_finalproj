@@ -24,7 +24,7 @@
      <x>0</x>
      <y>0</y>
      <width>1084</width>
-     <height>25</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -65,7 +65,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Intersection Sphere?</string>
+        <string>Bump Mapping</string>
        </property>
       </widget>
      </item>
@@ -130,7 +130,7 @@
      <item>
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press Space to shoot in first person mode&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press Space to set power, and click to shoot in first person mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>

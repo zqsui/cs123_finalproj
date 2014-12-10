@@ -880,7 +880,17 @@ void Sphere::init(const GLuint vertexLocation, const GLuint normalLocation, cons
 
 glm::vec3 Sphere::getSphereNorm(float theta, float phi)
 {
-    return glm::vec3(sin(phi)*cos(theta), cos(phi), sin(phi)*sin(theta));
+    glm::vec3 norm = glm::vec3(sin(phi)*cos(theta), cos(phi), sin(phi)*sin(theta));
+
+    float theta_i = 2.0 * M_PI / m_param2;
+
+    if(((int)(theta/theta_i))%5 ==0)
+    {
+        norm = glm::vec3(-1.0, 0.0, 0.0);
+    }
+
+
+    return norm;
 }
 
 

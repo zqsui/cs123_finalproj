@@ -12,8 +12,25 @@ Basketball::Basketball(glm::vec3 pos, float mass, float radius)
     m_isDisappeard = false;
     m_isFired = false;
 
-
+    m_power = 1;
+    m_spin = 0;
 }
+
+void Basketball::updateSpin(int spin)
+{
+    m_spin = spin;
+}
+
+int Basketball::getSpin()
+{
+    return m_spin;
+}
+
+void Basketball::setDisappear()
+{
+    m_isDisappeard = true;
+}
+
 
 bool Basketball::isDisappeared()
 {
@@ -27,6 +44,12 @@ Basketball::~Basketball()
 bool Basketball::isFired()
 {
     return m_isFired;
+}
+
+
+void Basketball::setScored()
+{
+    m_isScored = true;
 }
 
 bool Basketball::isScored()
