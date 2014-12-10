@@ -139,6 +139,7 @@ private:
     GLuint m_textureId;
     GLuint m_basketballTextureId;
     GLuint m_boardId;
+    GLuint m_normalId;
 
     glm::vec3 arrow_vel;
 

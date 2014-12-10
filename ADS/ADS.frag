@@ -5,6 +5,8 @@ in vec3 LightIntensity;
 
 uniform sampler2D textureSampler;
 
+
+
 layout ( location = 0) out vec4 FragColor;
 
 void main()
@@ -12,7 +14,7 @@ void main()
     vec4 texColor = texture2D(textureSampler, uv);
 
     //FragColor = texColor;
-    float blend = 0.5;
+    float blend = 1;
     FragColor = vec4(LightIntensity, 1.0) * blend + (1 - blend) * texColor;
     //FragColor = texColor;
 }

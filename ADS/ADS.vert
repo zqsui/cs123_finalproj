@@ -23,6 +23,10 @@ uniform mat4 M_Matrix;
 uniform mat4 V_Matrix;
 uniform mat4 P_Matrix;
 
+//uniform int isBumpMapping
+
+uniform sampler2D normalSampler;
+
 void main()
 {
         uv = texCoord;
@@ -41,6 +45,9 @@ void main()
 	vec3 r = reflect( -s, tnorm );
 	vec3 ambient = La * Ka;
 
+//        if(isBumpMapping)
+            tnorm = normalize(texture2D(normalSampler, uv).rgb * 2.0 - 1.0);
+
 	float sDotN = max( dot( s, tnorm), 0.0 );
 	vec3 diffuse = Ld * Ka * sDotN;
 
@@ -51,7 +58,8 @@ void main()
 	}
 
 	//Diffuse shading equation
-	LightIntensity = ambient + diffuse + specular;
+//        LightIntensity = ambient + diffuse + specular;
+        LightIntensity = texture2D(normalSampler, uv).rgb;//diffuse;
 
 	gl_Position = MVP_Matrix * vec4(in_Position,1.0);
 }

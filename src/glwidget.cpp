@@ -339,7 +339,7 @@ void GLWidget::initWall()
    m_wallList.push_back(tmpWall);
 
    //ground
-   Ka = glm::vec3(0.0f);
+   Ka = glm::vec3(0.0f, 0.5f, 0.0f);
    m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
    modelMat = glm::mat4(1.0f);
    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 0.0f, 0.0f ) );
@@ -435,9 +435,13 @@ void GLWidget::renderWall()
         m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
         m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
         if ( i == (m_wallList.size() - 1)){
+            //glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
+            //m_shader.setUniform("textureSampler", Shader::INT, 0);
+            //glBindTexture(GL_TEXTURE_2D, m_textureId);
+
             glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
-            m_shader.setUniform("textureSampler", Shader::INT, 0);
-            glBindTexture(GL_TEXTURE_2D, m_textureId);
+            m_shader.setUniform("normalSampler", Shader::INT, 0);
+            glBindTexture(GL_TEXTURE_2D, m_normalId);
             m_quad->draw();
             glBindTexture(GL_TEXTURE_2D, 0);
          }
@@ -617,12 +621,13 @@ void GLWidget::initializeGL()
     m_textureId = m_shader.loadTexture("../cs123_finalproj/textures/basketball_court2.jpg");
     m_basketballTextureId = m_shader.loadTexture("../cs123_finalproj/textures/BasketballColor.jpg");
     m_boardId = m_shader.loadTexture("../cs123_finalproj/textures/Board2.jpg");
+    m_normalId = m_shader.loadTexture("../cs123_finalproj/textures/BasketballColor.jpg");
+
 
     // Set lighting properties.
-    glm::vec3 La = glm::vec3( 0.8f, 0.8f, 0.8f );
+    glm::vec3 La = glm::vec3( 0.5f );
     m_shader.setUniform( "La", Shader::VEC3, &La );
-
-    glm::vec3 Lpos = glm::vec3( 1.0f, 1.0f, 1.0f );
+    glm::vec3 Lpos = glm::vec3( 5.0f, 5.0f, 5.0f );
     m_shader.setUniform( "Lpos", Shader::VEC3, &Lpos );
     glm::vec3 Ld = glm::vec3( 1.0f, 1.0f, 1.0f );
     m_shader.setUniform( "Ld", Shader::VEC3, &Ld );
@@ -661,11 +666,11 @@ void GLWidget::paintGL()
 
 //    renderArrow();
 
-    glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
-    m_shader.setUniform("textureSampler", Shader::INT, 0);
-    glBindTexture(GL_TEXTURE_2D, m_basketballTextureId);
+//    glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
+//    m_shader.setUniform("textureSampler", Shader::INT, 0);
+//    glBindTexture(GL_TEXTURE_2D, m_basketballTextureId);
     renderBasketball();
-    glBindTexture(GL_TEXTURE_2D, 0);
+//    glBindTexture(GL_TEXTURE_2D, 0);
 
     renderWall();
     renderHoop();
@@ -693,7 +698,7 @@ void GLWidget::renderBasketball()
 //    std::cout<<m_basketballList.size()<<std::endl;
     for(unsigned int i = 0; i<m_basketballList.size();i++)
     {
-        float delta_t = 1.0f/(float)m_fps;
+        float delta_t = 0.5f/(float)m_fps;
         Basketball *cur_basketball = m_basketballList[i];
         float scale = cur_basketball->getRadius() * 2;
 
@@ -782,7 +787,7 @@ void GLWidget::renderBasketball()
         }
 
 
-        glm::vec3 Ka = glm::vec3(0.2f);
+        glm::vec3 Ka = glm::vec3(1.0f, 0.0f, 0.0f);
         m_shader.setUniform( "Ka", Shader::VEC3, &Ka );
         m_shader.setUniform( "M_Matrix", Shader::MAT4, &basketballModelMat0[ 0 ][ 0 ] );
 
@@ -798,8 +803,8 @@ void GLWidget::processScoring(Basketball *cur_basketball)
 {
     glm::vec3 hoop_pos = glm::vec3(m_hoop.modelMat * glm::vec4(0.0, 0.0, 0.0, 1.0));
     glm::vec3 cur_pos = cur_basketball->getPos();
-    if((point2PointDist(hoop_pos, cur_pos) < m_hoopsize - 0.05)
-            && fabs(cur_pos.y - hoop_pos.y) < 0.1)
+    if((point2PointDist(hoop_pos, cur_pos) < m_hoopsize * 0.45 - 0.15)
+            && fabs(cur_pos.y - hoop_pos.y) < 0.05)
     {
         glm::vec3 cur_vel = cur_basketball->getVel();
         cur_vel.x = 0.5 * rand()/RAND_MAX;
