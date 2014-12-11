@@ -24,8 +24,10 @@ void main()
     vec3 diffuse = Ld_out * Ka_out * sDotN;
 
     //FragColor = texColor;
-    FragColor = vec4(LightIntensity, 1.0) + vec4(diffuse, 1.0);
-    float blend = 1;
+    float blend = 0.5;
+    vec4 blend_diffuse = (1 - blend) * texColor + vec4(diffuse, 1.0) * blend;
+    FragColor = vec4(LightIntensity, 1.0) + blend_diffuse; //vec4(diffuse, 1.0);
+
     //FragColor = vec4(LightIntensity, 1.0);//* blend + (1 - blend) * texColor;
     //FragColor = texColor;
 }

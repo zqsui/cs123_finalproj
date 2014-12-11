@@ -51,7 +51,7 @@ void main()
           //  tnorm = normalize(texture2D(normalSampler, uv).rgb * 2.0 - 1.0);
         Ld_out = Ld;
         Ka_out = Ka;
-        s_out = s;
+        s_out = vec3((inverse(MV_Matrix)) * vec4(s, 1.0));
 
 	float sDotN = max( dot( s, tnorm), 0.0 );
 	vec3 diffuse = Ld * Ka * sDotN;

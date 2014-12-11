@@ -427,6 +427,16 @@ void GLWidget::initTarget()
 
 void GLWidget::renderWall()
 {
+    glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
+    //m_shader.setUniform("normalSampler", Shader::INT, 0);
+    glBindTexture(GL_TEXTURE_2D, m_textureId);
+    glUniform1i(m_shader.uniformLocation("textureSampler"), 0);
+
+    glActiveTexture(GL_TEXTURE1); // Set the active texture to texture 0.
+    //m_shader.setUniform("normalSampler", Shader::INT, 0);
+    glBindTexture(GL_TEXTURE_2D, m_normalId);
+    glUniform1i(m_shader.uniformLocation("normalSampler"), 1);
+
     for(unsigned int i = 0; i < m_wallList.size();i++)
     {
         Wall cur_wall = m_wallList[i];
@@ -435,18 +445,15 @@ void GLWidget::renderWall()
         m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
         m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
         if ( i == (m_wallList.size() - 1)){
-            glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
-            //m_shader.setUniform("normalSampler", Shader::INT, 0);
-            glBindTexture(GL_TEXTURE_2D, m_textureId);
-            glUniform1i(m_shader.uniformLocation("normalSampler"), 0);
+
             //glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
             //m_shader.setUniform("normalSampler", Shader::INT, 0);
             //glBindTexture(GL_TEXTURE_2D, m_normalId);
             m_quad->draw();
-            glBindTexture(GL_TEXTURE_2D, 0);
          }
         else m_quad->draw();
     }
+    glBindTexture(GL_TEXTURE_2D, 0);
 
 }
 
@@ -618,11 +625,11 @@ void GLWidget::initializeGL()
     m_shader.compile();
     m_shader.use();
 
-    m_textureId = m_shader.loadTexture("../cs123_finalproj/textures/testNormalMap.png");
+    m_textureId = m_shader.loadTexture("../cs123_finalproj/textures/brick.jpg");
     std::cout << m_textureId << std::endl;
     m_basketballTextureId = m_shader.loadTexture("../cs123_finalproj/textures/BasketballColor.jpg");
     m_boardId = m_shader.loadTexture("../cs123_finalproj/textures/Board2.jpg");
-    m_normalId = m_shader.loadTexture("../cs123_finalproj/textures/Board2.jpg");
+    m_normalId = m_shader.loadTexture("../cs123_finalproj/textures/brickBump.jpg");
 
 
     // Set lighting properties.
