@@ -195,7 +195,7 @@ void Shader::setUniform(const std::string uniformName, UNIFORM_TYPE type, void *
     switch( type )
     {
         case INT:
-            glUniform1i( uniformLocation( uniformName ), 0); // Tell the shader to use texture 0.
+            glUniform1i( uniformLocation( uniformName ), 0 ); // Tell the shader to use texture 0.
         case FLOAT:
             glUniform1fv( uniformLocation( uniformName ), 1, (GLfloat*) t );
             break;

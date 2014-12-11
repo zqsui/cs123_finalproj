@@ -435,13 +435,13 @@ void GLWidget::renderWall()
         m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
         m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
         if ( i == (m_wallList.size() - 1)){
-            //glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
-            //m_shader.setUniform("textureSampler", Shader::INT, 0);
-            //glBindTexture(GL_TEXTURE_2D, m_textureId);
-
             glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
-            m_shader.setUniform("normalSampler", Shader::INT, 0);
-            glBindTexture(GL_TEXTURE_2D, m_normalId);
+            //m_shader.setUniform("normalSampler", Shader::INT, 0);
+            glBindTexture(GL_TEXTURE_2D, m_textureId);
+            glUniform1i(m_shader.uniformLocation("normalSampler"), 0);
+            //glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
+            //m_shader.setUniform("normalSampler", Shader::INT, 0);
+            //glBindTexture(GL_TEXTURE_2D, m_normalId);
             m_quad->draw();
             glBindTexture(GL_TEXTURE_2D, 0);
          }
@@ -618,10 +618,11 @@ void GLWidget::initializeGL()
     m_shader.compile();
     m_shader.use();
 
-    m_textureId = m_shader.loadTexture("../cs123_finalproj/textures/basketball_court2.jpg");
+    m_textureId = m_shader.loadTexture("../cs123_finalproj/textures/testNormalMap.png");
+    std::cout << m_textureId << std::endl;
     m_basketballTextureId = m_shader.loadTexture("../cs123_finalproj/textures/BasketballColor.jpg");
     m_boardId = m_shader.loadTexture("../cs123_finalproj/textures/Board2.jpg");
-    m_normalId = m_shader.loadTexture("../cs123_finalproj/textures/BasketballColor.jpg");
+    m_normalId = m_shader.loadTexture("../cs123_finalproj/textures/Board2.jpg");
 
 
     // Set lighting properties.
@@ -666,11 +667,11 @@ void GLWidget::paintGL()
 
 //    renderArrow();
 
-//    glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
-//    m_shader.setUniform("textureSampler", Shader::INT, 0);
-//    glBindTexture(GL_TEXTURE_2D, m_basketballTextureId);
+    glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
+    glBindTexture(GL_TEXTURE_2D, m_textureId);
+    m_shader.setUniform("normalSampler", Shader::INT, 0);
     renderBasketball();
-//    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     renderWall();
     renderHoop();
@@ -787,7 +788,7 @@ void GLWidget::renderBasketball()
         }
 
 
-        glm::vec3 Ka = glm::vec3(1.0f, 0.0f, 0.0f);
+        glm::vec3 Ka = glm::vec3(0.8f, 0.0f, 0.0f);
         m_shader.setUniform( "Ka", Shader::VEC3, &Ka );
         m_shader.setUniform( "M_Matrix", Shader::MAT4, &basketballModelMat0[ 0 ][ 0 ] );
 
