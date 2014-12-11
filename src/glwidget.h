@@ -80,7 +80,7 @@ private:
     void processCollisionBall2Wall(Basketball *cur_basketball, Wall cur_wall);
     void processCollisionBall2HoopBoard(Basketball *cur_basketball, HoopBoard cur_hoopBoard);
     void processScoring(Basketball *cur_basketball);
-
+    void processCollisionBall2Plane(Basketball *cur_basketball, Plane cur_plane);
     void renderBasketball();
 
 

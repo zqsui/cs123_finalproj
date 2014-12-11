@@ -4,7 +4,7 @@
 #include "GL/glew.h"
 #include "glm/glm/glm.hpp"
 
-#define GRAVITY 15.8
+#define GRAVITY 13.8
 
 class Basketball
 {

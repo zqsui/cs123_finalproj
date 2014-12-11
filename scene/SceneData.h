@@ -14,6 +14,12 @@ enum PrimitiveType {
     PRIMITIVE_QUAD
 };
 
+enum WallType {
+   WALL_BRICK,
+   WALL_GROUND,
+   WALL_SKY
+};
+
 
 struct Plane{
     float a, b, c, d;    
@@ -36,7 +42,9 @@ struct Wall{
     float mass;
     glm::vec3 vel;
     glm::vec3 normal;
-    Plane plane;    
+    Plane plane;
+    int wallType;
+
 };
 
 struct Hoop{

@@ -115,19 +115,140 @@ void GLWidget::initHoop(){
 
     //printVec3(torus_center);
     Plane tmpPlane;
+    float width = 1.0f*m_hoopsize;
+    float height = 0.2;
+    //front outside
     tmpPlane.a = 0.0;
     tmpPlane.b = 0.0;
     tmpPlane.c = 1.0;
-    tmpPlane.d = -(-m_wallsize + m_hoopsize * 0.5f + 0.55f + 0.5f * m_hoopsize);
     modelMat = glm::mat4(1.0f);
-    modelMat = glm::translate(modelMat, torus_center + glm::vec3(0.0, 0.0, 0.5f*m_hoopsize));
-    modelMat = glm::scale(modelMat, glm::vec3(m_hoopsize *0.5f, 0.05*m_hoopsize, 1.0));
-    tmpPlane.width = 1.0f*m_hoopsize;
-    tmpPlane.height = 0.05 * m_hoopsize;
     tmpPlane.centroid = torus_center + glm::vec3(0.0, 0.0, 0.5f*m_hoopsize);
+    tmpPlane.d = -tmpPlane.centroid.z;
+    modelMat = glm::translate(modelMat, tmpPlane.centroid);
+    tmpPlane.width = width;
+    tmpPlane.height = height;
+    tmpPlane.width_vec = glm::vec3(1.0f, 0.0f, 0.0f);
+    tmpPlane.height_vec = glm::vec3(0.0f, 1.0f, 0.0f);
+    modelMat = glm::scale(modelMat, glm::vec3(tmpPlane.width/2, tmpPlane.height/2, 1.0));
     tmpPlane.normal = glm::vec3(0.0, 0.0, 1.0);
     tmpPlane.modelMat = modelMat;
+    m_hoop.plane.push_back(tmpPlane);
 
+    //left outside
+    tmpPlane.a = 1.0;
+    tmpPlane.b = 0.0;
+    tmpPlane.c = 0.0;
+    modelMat = glm::mat4(1.0f);
+    tmpPlane.centroid = torus_center + glm::vec3(-0.5f*m_hoopsize, 0.0, 0.0);
+    tmpPlane.d = -tmpPlane.centroid.x;
+    modelMat = glm::translate(modelMat, tmpPlane.centroid);
+    tmpPlane.width = width;
+    tmpPlane.height = height;
+    tmpPlane.width_vec = glm::vec3(0.0f, 0.0f, 1.0f);
+    tmpPlane.height_vec = glm::vec3(0.0f, 1.0f, 0.0f);
+    modelMat = glm::scale(modelMat, glm::vec3(tmpPlane.width/2, tmpPlane.height/2, 1.0));
+    tmpPlane.normal = glm::vec3(-1.0, 0.0, 0.0);
+    tmpPlane.modelMat = modelMat;
+    m_hoop.plane.push_back(tmpPlane);
+
+    //right outside
+    tmpPlane.a = 1.0;
+    tmpPlane.b = 0.0;
+    tmpPlane.c = 0.0;
+    modelMat = glm::mat4(1.0f);
+    tmpPlane.centroid = torus_center + glm::vec3(0.5f*m_hoopsize, 0.0, 0.0);
+    tmpPlane.d = -tmpPlane.centroid.x;
+    modelMat = glm::translate(modelMat, tmpPlane.centroid);
+    tmpPlane.width = width;
+    tmpPlane.height = height;
+    tmpPlane.width_vec = glm::vec3(0.0f, 0.0f, -1.0f);
+    tmpPlane.height_vec = glm::vec3(0.0f, 1.0f, 0.0f);
+    modelMat = glm::scale(modelMat, glm::vec3(tmpPlane.width/2, tmpPlane.height/2, 1.0));
+    tmpPlane.normal = glm::vec3(1.0, 0.0, 0.0);
+    tmpPlane.modelMat = modelMat;
+    m_hoop.plane.push_back(tmpPlane);
+
+
+    //top left
+    float pipe_radius = 0.05*m_hoopsize/2;
+    tmpPlane.a = 0.05;
+    tmpPlane.b = 1.0;
+    tmpPlane.c = 0.0;
+    tmpPlane.centroid = torus_center + glm::vec3(-0.5f*m_hoopsize + pipe_radius, pipe_radius, 0.0);
+    tmpPlane.d = -glm::dot(tmpPlane.centroid, glm::vec3(tmpPlane.a, tmpPlane.b, tmpPlane.c));
+    tmpPlane.width = width;
+    tmpPlane.height = height;
+    tmpPlane.width_vec = glm::vec3(0.0f, 0.0f, 1.0f);
+    tmpPlane.height_vec = glm::normalize(glm::vec3(1.0f, -0.05f, 0.0f));
+    tmpPlane.normal = glm::normalize(glm::vec3(tmpPlane.a, tmpPlane.b, tmpPlane.c));
+    m_hoop.plane.push_back(tmpPlane);
+
+    //top right
+    tmpPlane.a = -0.05;
+    tmpPlane.b = 1.0;
+    tmpPlane.c = 0.0;
+    tmpPlane.centroid = torus_center + glm::vec3(0.5f*m_hoopsize - pipe_radius, pipe_radius, 0.0);
+    tmpPlane.d = -glm::dot(tmpPlane.centroid, glm::vec3(tmpPlane.a, tmpPlane.b, tmpPlane.c));//-tmpPlane.centroid.y;
+    tmpPlane.width = width;
+    tmpPlane.height = height;
+    tmpPlane.width_vec = glm::vec3(0.0f, 0.0f, 1.0f);
+    tmpPlane.height_vec = glm::normalize(glm::vec3(1.0f, 0.05f, 0.0f));
+    tmpPlane.normal = glm::normalize(glm::vec3(tmpPlane.a, tmpPlane.b, tmpPlane.c));
+    m_hoop.plane.push_back(tmpPlane);
+
+
+    //top front
+    tmpPlane.a = 0.0;
+    tmpPlane.b = 1.0;
+    tmpPlane.c = -0.05;
+    tmpPlane.centroid = torus_center + glm::vec3(0.0, pipe_radius, 0.5f*m_hoopsize - pipe_radius);
+    printVec3(tmpPlane.centroid);
+    tmpPlane.d = -glm::dot(tmpPlane.centroid, glm::vec3(tmpPlane.a, tmpPlane.b, tmpPlane.c));
+    tmpPlane.width = width;
+    tmpPlane.height = height;
+    tmpPlane.width_vec = glm::vec3(1.0f, 0.0f, 0.0f);
+    tmpPlane.height_vec = glm::normalize(glm::vec3(0.0f, -0.05f, -1.0f));
+    tmpPlane.normal = glm::normalize(glm::vec3(tmpPlane.a, tmpPlane.b, tmpPlane.c));
+    m_hoop.plane.push_back(tmpPlane);
+
+    //left inside
+    tmpPlane.a = 1.0;
+    tmpPlane.b = 0.0;
+    tmpPlane.c = 0.0;
+    tmpPlane.centroid = torus_center + glm::vec3(-0.5f*m_hoopsize + pipe_radius*2, 0.0, 0.0);
+    tmpPlane.d = -tmpPlane.centroid.x;
+    tmpPlane.width = width;
+    tmpPlane.height = height;
+    tmpPlane.width_vec = glm::vec3(0.0f, 0.0f, 1.0f);
+    tmpPlane.height_vec = glm::vec3(0.0f, 1.0f, 0.0f);
+    tmpPlane.normal = glm::vec3(1.0, 0.0, 0.0);
+    m_hoop.plane.push_back(tmpPlane);
+
+    //right inside
+    tmpPlane.a = 1.0;
+    tmpPlane.b = 0.0;
+    tmpPlane.c = 0.0;
+    tmpPlane.centroid = torus_center + glm::vec3(0.5f*m_hoopsize - pipe_radius * 2, 0.0, 0.0);
+    tmpPlane.d = -tmpPlane.centroid.x;
+    tmpPlane.width = width;
+    tmpPlane.height = height;
+    tmpPlane.width_vec = glm::vec3(0.0f, 0.0f, -1.0f);
+    tmpPlane.height_vec = glm::vec3(0.0f, 1.0f, 0.0f);
+    modelMat = glm::scale(modelMat, glm::vec3(tmpPlane.width/2, tmpPlane.height/2, 1.0));
+    tmpPlane.normal = glm::vec3(-1.0, 0.0, 0.0);
+    m_hoop.plane.push_back(tmpPlane);
+
+    //front inside
+    tmpPlane.a = 0.0;
+    tmpPlane.b = 0.0;
+    tmpPlane.c = 1.0;
+    tmpPlane.centroid = torus_center + glm::vec3(0.0, 0.0, 0.5f*m_hoopsize - pipe_radius * 2);
+    tmpPlane.d = -tmpPlane.centroid.z;
+    tmpPlane.width = width;
+    tmpPlane.height = height;
+    tmpPlane.width_vec = glm::vec3(1.0f, 0.0f, 0.0f);
+    tmpPlane.height_vec = glm::vec3(0.0f, 1.0f, 0.0f);
+    tmpPlane.normal = glm::vec3(0.0, 0.0, -1.0);
     m_hoop.plane.push_back(tmpPlane);
 
 //    struct Plane{
@@ -810,7 +931,8 @@ void GLWidget::renderBasketball()
             if(!cur_basketball->isScored())
                 processScoring(cur_basketball);
 
-            if(EQ(glm::length(cur_basketball->getVel()), 0))
+//            std::cout<<cur_pos.y<<std::endl;
+            if(EQ(glm::length(cur_basketball->getVel()), 0) && EQ(cur_pos.y, 0.149521))
                 cur_basketball->setDisappear();
         }
         else
@@ -835,8 +957,12 @@ void GLWidget::processScoring(Basketball *cur_basketball)
 {
     glm::vec3 hoop_pos = glm::vec3(m_hoop.modelMat * glm::vec4(0.0, 0.0, 0.0, 1.0));
     glm::vec3 cur_pos = cur_basketball->getPos();
-    if((point2PointDist(hoop_pos, cur_pos) < m_hoopsize * 0.45 - 0.15)
-            && fabs(cur_pos.y - hoop_pos.y) < 0.05)
+//    std::cout<<"---"<<std::endl;
+//    std::cout<<point2PointDist(hoop_pos, cur_pos)<<std::endl;
+//    std::cout<<fabs(cur_pos.y - hoop_pos.y)<<std::endl;
+
+    if((point2PointDist(hoop_pos, cur_pos) < m_hoopsize * 0.45 - 0.149521)
+            && fabs(cur_pos.y - hoop_pos.y) < 0.2)
     {
         glm::vec3 cur_vel = cur_basketball->getVel();
         cur_vel.x = 0.5 * rand()/RAND_MAX;
@@ -874,8 +1000,61 @@ void GLWidget::processCollision(Basketball *cur_basketball, int k)
         processCollisionBall2HoopBoard(cur_basketball, cur_hoopBoard);
     }
 
+    for(unsigned int i = 0; i < m_hoop.plane.size();i++)
+    {
+        Plane cur_plane = m_hoop.plane[i];
+        HoopBoard tmpHoopBoard;
+        tmpHoopBoard.plane = cur_plane;
+        tmpHoopBoard.mass = 999999;
+        tmpHoopBoard.vel = glm::vec3(0.0f);
+        tmpHoopBoard.object_type = PRIMITIVE_QUAD;
+
+        processCollisionBall2HoopBoard(cur_basketball, tmpHoopBoard);
+    }
 
 }
+
+void GLWidget::processCollisionBall2Plane(Basketball *cur_basketball, Plane cur_plane)
+{
+
+
+////    Plane cur_plane = cur_hoopBoard.plane;
+//    float dist = point2PlaneDist(cur_basketball->getPos(), cur_plane);
+//    if(cur_basketball->getRadius() - dist > EPSILON)
+//    {
+//      glm::vec3 intersectVerticalPoint =
+//            point2PlaneIntersectionPoint(cur_basketball->getPos(), cur_plane, cur_plane.normal);
+//      if(isPointInPlane(intersectVerticalPoint, cur_plane))
+//      {
+////          glm::vec3 dir = -cur_plane.normal;
+////          glm::vec3 pos_new = cur_basketball->getPos() -
+////                  1.0f * (cur_basketball->getRadius()  - dist) * glm::normalize(dir);
+////          cur_basketball->updatePos(pos_new);
+
+////          glm::vec3 ball_vel = cur_basketball->getVel();
+////          glm::vec3 quad_vel = cur_hoopBoard.vel;
+////          float ball_mass = cur_basketball->getMass();
+////          float quad_mass = cur_hoopBoard.mass;
+////          momentumTheory(ball_mass, ball_vel, quad_mass, quad_vel, dir);
+////          float scale_v;
+////          float vel_length = glm::length(ball_vel);
+////          if(vel_length<0.5)
+////              scale_v = 0;
+////          else if(vel_length < 1.5)
+////              scale_v = 0.5;
+////          else
+////              scale_v = 0.9;
+////          ball_vel *= scale_v;
+////          cur_basketball->updateVel(ball_vel);
+//      }
+//      else
+//          return;
+//    }
+//    else
+//        return;
+
+}
+
 
 
 void GLWidget::processCollisionBall2Ball(Basketball *basketball_1, Basketball *basketball_2)

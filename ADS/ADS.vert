@@ -13,6 +13,7 @@ out vec3 LightIntensity;
 out vec3 s_out;
 out vec3 Ka_out;
 out vec3 Ld_out;
+out vec3 diffuse_out;
 
 uniform vec3 La;		//Ambient light intensity
 
@@ -55,6 +56,8 @@ void main()
 
 	float sDotN = max( dot( s, tnorm), 0.0 );
 	vec3 diffuse = Ld * Ka * sDotN;
+
+        diffuse_out = diffuse;
 
 	vec3 specular = vec3(0.0);
 	if( sDotN > 0.0 )
