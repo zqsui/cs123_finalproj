@@ -140,6 +140,8 @@ private:
     GLuint m_basketballTextureId;
     GLuint m_boardId;
     GLuint m_normalId;
+    GLuint m_courtId;
+    GLuint m_skyId;
 
     glm::vec3 arrow_vel;
 

@@ -192,7 +192,7 @@ void GLWidget::initBasketballStand()
     hoop_translation_vec = glm::vec3( 0.0f, 3.5f, -m_wallsize + 0.55f );
     glm::vec3 scale_vec = glm::vec3(1.17f, 0.8f, 1.0f);
 
-    tmpHoopBoard.Ka = glm::vec3( 0.5f);
+    tmpHoopBoard.Ka = glm::vec3( 0.3f);
     tmpHoopBoard.mass = standmass;
     tmpHoopBoard.vel = standvel;
     modelMat = glm::mat4(1.0f);
@@ -215,7 +215,7 @@ void GLWidget::initBasketballStand()
 
     // back quad       
     hoop_translation_vec = glm::vec3( 0.0f, 3.5f, -m_wallsize + 0.5f );
-    tmpHoopBoard.Ka = glm::vec3( 0.5f);
+    tmpHoopBoard.Ka = glm::vec3( 0.3f);
     tmpHoopBoard.mass = standmass;
     tmpHoopBoard.vel = standvel;
     modelMat = glm::mat4(1.0f);
@@ -259,8 +259,10 @@ void GLWidget::initWall()
     glm::vec3 wallvel = glm::vec3(0.0);
 
 //    // Ceiling
+    Ka =glm::vec3(0.1);
+
     glm::mat4 modelMat = glm::mat4(1.0f);
-    tmpWall.Ka =  glm::vec3( 0.0f, 0.7f, 0.93f);
+    tmpWall.Ka =  5.0f * Ka;
     modelMat = glm::translate( modelMat, glm::vec3( 0.0f, m_wallsize, 0.0f ) );
     modelMat = glm::scale( modelMat, glm::vec3( m_wallsize ) );
     modelMat = glm::rotate(modelMat, 90.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
@@ -272,6 +274,7 @@ void GLWidget::initWall()
     tmpWall.mass = wallmass;
     tmpWall.vel = wallvel;
     tmpWall.normal = glm::vec3(0.0, -1.0, 0.0);
+    tmpWall.wallType = WALL_SKY;
     m_wallList.push_back(tmpWall);
 
     // Back
@@ -279,7 +282,7 @@ void GLWidget::initWall()
     modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 0.0f, m_wallsize ) );
     modelMat = glm::scale( modelMat, glm::vec3( m_wallsize ) );
     modelMat = glm::rotate(modelMat, 180.0f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-    tmpWall.Ka =  glm::vec3( 0.0f, 0.7f, 0.93f);
+    tmpWall.Ka = Ka;
     tmpWall.modelMat = modelMat;
     tmpWall.plane.a = 0.0;
     tmpWall.plane.b = 0.0;
@@ -288,6 +291,7 @@ void GLWidget::initWall()
     tmpWall.mass = wallmass;
     tmpWall.vel = wallvel;
     tmpWall.normal = glm::vec3(0.0, 0.0, -1.0);
+    tmpWall.wallType = WALL_BRICK;
     m_wallList.push_back(tmpWall);
 
     // Right
@@ -295,7 +299,7 @@ void GLWidget::initWall()
     modelMat = glm::translate( modelMat, glm::vec3( m_wallsize, 0.0f, 0.0f ) );
     modelMat = glm::scale( modelMat, glm::vec3( m_wallsize ) );
     modelMat = glm::rotate(modelMat, -90.0f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-    tmpWall.Ka =  glm::vec3( 0.0f, 0.7f, 0.93f);
+    tmpWall.Ka = Ka;
     tmpWall.modelMat = modelMat;
     tmpWall.plane.a = 1.0;
     tmpWall.plane.b = 0.0;
@@ -304,6 +308,7 @@ void GLWidget::initWall()
     tmpWall.mass = wallmass;
     tmpWall.vel = wallvel;
     tmpWall.normal = glm::vec3(-1.0, 0.0, 0.0);
+    tmpWall.wallType = WALL_BRICK;
     m_wallList.push_back(tmpWall);
 
     // Left
@@ -311,7 +316,7 @@ void GLWidget::initWall()
    modelMat = glm::translate( modelMat, glm::vec3( -m_wallsize, 0.0f, 0.0f ) );
    modelMat = glm::scale( modelMat, glm::vec3( m_wallsize) );
    modelMat = glm::rotate(modelMat, 90.0f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-   tmpWall.Ka =  glm::vec3( 0.0f, 0.7f, 0.93f);
+   tmpWall.Ka = Ka;
    tmpWall.modelMat = modelMat;
    tmpWall.plane.a = 1.0;
    tmpWall.plane.b = 0.0;
@@ -320,14 +325,15 @@ void GLWidget::initWall()
    tmpWall.mass = wallmass;
    tmpWall.vel = wallvel;
    tmpWall.normal = glm::vec3(1.0, 0.0, 0.0);
+   tmpWall.wallType = WALL_BRICK;
    m_wallList.push_back(tmpWall);
 
     //front
-   Ka = glm::vec3(0.9f, 0.74f, 0.2f);
+
    modelMat = glm::mat4(1.0f);
    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 0.0f, -m_wallsize ) );
    modelMat = glm::scale( modelMat, glm::vec3( m_wallsize ) );
-   tmpWall.Ka =  Ka;
+   tmpWall.Ka = Ka;
    tmpWall.modelMat = modelMat;
    tmpWall.plane.a = 0.0;
    tmpWall.plane.b = 0.0;
@@ -336,16 +342,17 @@ void GLWidget::initWall()
    tmpWall.mass = wallmass;
    tmpWall.vel = wallvel;
    tmpWall.normal = glm::vec3(0.0, 0.0, 1.0);
+   tmpWall.wallType = WALL_BRICK;
    m_wallList.push_back(tmpWall);
 
    //ground
-   Ka = glm::vec3(0.0f, 0.5f, 0.0f);
-   m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
+
+   //m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
    modelMat = glm::mat4(1.0f);
    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 0.0f, 0.0f ) );
    modelMat = glm::scale( modelMat, glm::vec3( m_wallsize, m_wallsize, m_wallsize) );
    modelMat = glm::rotate(modelMat, -90.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
-   tmpWall.Ka =  Ka;
+   tmpWall.Ka = Ka;
    tmpWall.modelMat = modelMat;
    tmpWall.plane.a = 0.0;
    tmpWall.plane.b = 1.0;
@@ -354,6 +361,7 @@ void GLWidget::initWall()
    tmpWall.mass = wallmass;
    tmpWall.vel = wallvel;
    tmpWall.normal = glm::vec3(0.0, 1.0, 0.0);
+   tmpWall.wallType = WALL_GROUND;
    m_wallList.push_back(tmpWall);
 }
 /**
@@ -427,34 +435,46 @@ void GLWidget::initTarget()
 
 void GLWidget::renderWall()
 {
-    glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
-    //m_shader.setUniform("normalSampler", Shader::INT, 0);
-    glBindTexture(GL_TEXTURE_2D, m_textureId);
-    glUniform1i(m_shader.uniformLocation("textureSampler"), 0);
-
-    glActiveTexture(GL_TEXTURE1); // Set the active texture to texture 0.
-    //m_shader.setUniform("normalSampler", Shader::INT, 0);
-    glBindTexture(GL_TEXTURE_2D, m_normalId);
-    glUniform1i(m_shader.uniformLocation("normalSampler"), 1);
-
     for(unsigned int i = 0; i < m_wallList.size();i++)
     {
         Wall cur_wall = m_wallList[i];
         glm::vec3 Ka = cur_wall.Ka;
         glm::mat4 modelMat =cur_wall.modelMat;
+        int walltype = cur_wall.wallType;
         m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
         m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
-        if ( i == (m_wallList.size() - 1)){
+//        std::cout<<walltype<<std::endl;
+        switch (walltype) {
+        case WALL_BRICK:
+            glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
+            glBindTexture(GL_TEXTURE_2D, m_textureId);
+            glUniform1i(m_shader.uniformLocation("textureSampler"), 0);
 
-            //glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
-            //m_shader.setUniform("normalSampler", Shader::INT, 0);
-            //glBindTexture(GL_TEXTURE_2D, m_normalId);
-            m_quad->draw();
-         }
-        else m_quad->draw();
+            glActiveTexture(GL_TEXTURE1); // Set the active texture to texture 1.
+            glBindTexture(GL_TEXTURE_2D, m_normalId);
+            glUniform1i(m_shader.uniformLocation("normalSampler"), 1);
+            glUniform1i(m_shader.uniformLocation("isBumpMapping"), settings.showIntersectSpheres);
+            break;
+        case WALL_SKY:
+            glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
+            glBindTexture(GL_TEXTURE_2D, m_skyId);
+            glUniform1i(m_shader.uniformLocation("textureSampler"), 0);
+            glUniform1i(m_shader.uniformLocation("isBumpMapping"), 0);
+            break;
+        case WALL_GROUND:
+            glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
+            glBindTexture(GL_TEXTURE_2D, m_courtId);
+            glUniform1i(m_shader.uniformLocation("textureSampler"), 0);
+            glUniform1i(m_shader.uniformLocation("isBumpMapping"), 0);
+            break;
+        default:
+            break;
+        }
+        m_quad->draw();
+
     }
-    glBindTexture(GL_TEXTURE_2D, 0);
-
+    glUniform1i(m_shader.uniformLocation("isBumpMapping"), 0);
+glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void GLWidget::renderHoop()
@@ -626,10 +646,11 @@ void GLWidget::initializeGL()
     m_shader.use();
 
     m_textureId = m_shader.loadTexture("../cs123_finalproj/textures/brick.jpg");
-    std::cout << m_textureId << std::endl;
     m_basketballTextureId = m_shader.loadTexture("../cs123_finalproj/textures/BasketballColor.jpg");
     m_boardId = m_shader.loadTexture("../cs123_finalproj/textures/Board2.jpg");
     m_normalId = m_shader.loadTexture("../cs123_finalproj/textures/brickBump.jpg");
+    m_courtId = m_shader.loadTexture("../cs123_finalproj/textures/court.jpg");
+    m_skyId = m_shader.loadTexture("../cs123_finalproj/textures/sky.jpg");
 
 
     // Set lighting properties.
@@ -674,15 +695,18 @@ void GLWidget::paintGL()
 
 //    renderArrow();
 
-    glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
-    glBindTexture(GL_TEXTURE_2D, m_textureId);
-    m_shader.setUniform("normalSampler", Shader::INT, 0);
-    renderBasketball();
-    glBindTexture(GL_TEXTURE_2D, 0);
+
 
     renderWall();
     renderHoop();
     renderStand();
+
+    glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
+    glBindTexture(GL_TEXTURE_2D, m_basketballTextureId);
+    m_shader.setUniform("normalSampler", Shader::INT, 0);
+    renderBasketball();
+    glBindTexture(GL_TEXTURE_2D, 0);
+
     //renderRoom();
 
     //Render intersection spheres
@@ -795,7 +819,7 @@ void GLWidget::renderBasketball()
         }
 
 
-        glm::vec3 Ka = glm::vec3(0.8f, 0.0f, 0.0f);
+        glm::vec3 Ka = glm::vec3(0.2f);
         m_shader.setUniform( "Ka", Shader::VEC3, &Ka );
         m_shader.setUniform( "M_Matrix", Shader::MAT4, &basketballModelMat0[ 0 ][ 0 ] );
 
