@@ -6,7 +6,10 @@ TEMPLATE = app
 INCLUDEPATH += src
 DEPENDPATH += src
 
-unix:!macx: LIBS += -lGLEW
+unix:!macx: {
+LIBS += -lGLEW
+QMAKE_CXXFLAGS += -std=c++11
+}
 
 SOURCES += \
     src/main.cpp \

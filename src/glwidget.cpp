@@ -13,8 +13,8 @@
 
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent), m_timer(this), m_fps(60.0f), m_increment(0), m_angleX(0.0f),
-      m_angleY(0.0f), m_xDiff(0.0f), m_zDiff(0.0f), m_arrowRadius(0.1), m_targetRadius(0.5),
-      m_score(0), m_canCollide(false)
+      m_angleY(0.0f), m_xDiff(0.0f), m_zDiff(0.0f),
+      m_score(0)
 {
 
     // Set up the camera    
@@ -40,8 +40,7 @@ GLWidget::GLWidget(QWidget *parent)
     m_originalMouseX = -1;
     m_originalMouseY = -1;
 
-    m_arrowPos = glm::vec3(0,-3.0f,0);
-    m_targetPos = m_arrowPos;
+
 
     m_power = 1;
     m_firstPersonMode = false;
@@ -490,69 +489,6 @@ void GLWidget::initWall()
 /**
  * Initializes the target's vertex and normal data.
  */
-void GLWidget::initTarget()
-{
-    GLuint positionAttrib = m_shader.attrib("in_Position"); // Index of the vertex position attribute.
-    GLuint normalAttrib = m_shader.attrib("in_Normal"); // Index of the vertex normal attribute.
-
-    // TODO: Implement this method.
-    int n_tessel = 6;
-    float r = 0.5;
-    float theta = 2*M_PI/n_tessel;
-    m_n_all = (n_tessel+2)*3*2;
-    GLfloat *vertexBufferData = new GLfloat[m_n_all];
-
-    int i;
-    for(i=0;i<5;i++)
-        vertexBufferData[i] = 0.0f;
-    vertexBufferData[5] = -1.0f;
-    int index;
-    for(i=0;i<n_tessel;i++)
-    {
-        index = 6 + i*6;
-        vertexBufferData[index] = r *cos(theta*i);
-        vertexBufferData[index+1] = r * sin(-theta*i);
-        vertexBufferData[index+2] = 0.0f;
-        vertexBufferData[index+3] = 0.0f;
-        vertexBufferData[index+4] = 0.0f;
-        vertexBufferData[index+5] = -1.0f;
-    }
-
-    index = 6 + i*6;
-    vertexBufferData[index] = r *cos(theta*i);
-    vertexBufferData[index+1] = r * sin(-theta*i);
-    vertexBufferData[index+2] = 0.0f;
-    vertexBufferData[index+3] = 0.0f;
-    vertexBufferData[index+4] = 0.0f;
-    vertexBufferData[index+5] = -1.0f;
-
-    // Step 2: initialize and bind a Vertex Array Object -- see glGenVertexArrays and glBindVertexArray
-    glGenVertexArrays(1, &m_vaoID);
-    glBindVertexArray(m_vaoID);
-
-
-    // Step 3: initialize and bind a buffer for your vertex data -- see glGenBuffers and glBindBuffer
-
-    glGenBuffers(1, &m_vboID);
-    glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
-
-    // Step 4: Send your vertex data to the GPU -- see glBufferData
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)* m_n_all, vertexBufferData, GL_STATIC_DRAW);
-
-    // Step 5: Expose the vertices to other OpenGL components (namely, shaders)
-    //         -- see glEnableVertexAttribArray and glVertexAttribPointer
-    glEnableVertexAttribArray(positionAttrib);
-    glEnableVertexAttribArray(normalAttrib);
-    glVertexAttribPointer(positionAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*6, (void*) 0);
-    glVertexAttribPointer(normalAttrib, 3, GL_FLOAT, GL_TRUE, sizeof(GLfloat)*6, (void*) (sizeof(GLfloat) * 3));
-
-    // Step 6: Clean up -- unbind the buffer and vertex array.
-    //         It is a good habit to leave the state of OpenGL the way you found it
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-
-}
 
 
 
@@ -667,79 +603,6 @@ void GLWidget::renderStand()
 }
 
 
-
-/**
- * Renders the target and sets its position via setTargetPosition.
- * You have to fill in this method.
- */
-void GLWidget::renderTarget()
-{
-    // Sets a lighting uniform to make target appear orange.
-    glm::vec3 Ka = glm::vec3( 1.0f, 0.5f, 0.0f);
-    m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
-
-    // TODO: Implement this method.
-
-    glm::mat4 targetModelMat;
-    //setTargetPosition(glm::vec3(0, 0, 0));
-    //targetModelMat = glm::translate(m_targetPos, glm::vec3(0, 0, 3));
-    //targetModelMat =
-    targetModelMat =glm::translate(glm::mat4(1.0), glm::vec3(0, 1, 3.0));
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &targetModelMat[ 0 ][ 0 ]);
-    setTargetPosition(glm::vec3(0, 1, 3.0));
-    //targetModelMat = glm::translate(targetModelMat, glm::vec3(0, 0, 3));
-
-    glBindVertexArray(m_vaoID);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, m_n_all);
-    glBindVertexArray(0);
-
-}
-
-
-/**
- * Renders the intersection sphere for the arrow.
- * You need to fill in this method.
- */
-void GLWidget::renderArrowSphere()
-{
-    // Sets a lighting uniform to make sphere appear gray.
-    glm::vec3 Ka = glm::vec3( 0.5f, 0.5f, 0.5f);
-    m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
-
-    // TODO: Implement this method.
-
-    glm::mat4 arrowModelMat;
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &arrowModelMat[0][0]);
-
-    glm::mat4 arrowSphereMat;
-    //float scale = getArrowRadius();
-    //arrowSphereMat = glm::scale(glm::mat4(1.0), glm::vec3(scale, scale, scale));
-    //arrowSphereMat = glm::translate(arrowSphereMat, getArrowPosition());
-    //arrowSphereMat = glm::translate(glm::mat4(1.0), getArrowPosition());
-
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &arrowSphereMat[ 0 ][ 0 ]);
-    m_sphere->draw();
-}
-
-
-/**
- * Render the intersection sphere for the target.
- * You need to fill in this method.
- */
-void GLWidget::renderTargetSphere()
-{
-    // Sets a lighting uniform to make sphere appear gray.
-    glm::vec3 Ka = glm::vec3( 0.5f, 0.5f, 0.5f);
-    m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
-
-    // TODO: Implement this method.
-    glm::mat4 targetSphereMat;
-    float scale = getTargetRadius();
-    targetSphereMat = glm::scale(glm::translate(glm::mat4(1.0), getTargetPosition()), glm::vec3(scale, scale, scale));
-
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &targetSphereMat[ 0 ][ 0 ]);
-    m_sphere ->draw();
-}
 
 
 /**
@@ -1019,47 +882,6 @@ void GLWidget::processCollision(Basketball *cur_basketball, int k)
 
 }
 
-void GLWidget::processCollisionBall2Plane(Basketball *cur_basketball, Plane cur_plane)
-{
-
-
-////    Plane cur_plane = cur_hoopBoard.plane;
-//    float dist = point2PlaneDist(cur_basketball->getPos(), cur_plane);
-//    if(cur_basketball->getRadius() - dist > EPSILON)
-//    {
-//      glm::vec3 intersectVerticalPoint =
-//            point2PlaneIntersectionPoint(cur_basketball->getPos(), cur_plane, cur_plane.normal);
-//      if(isPointInPlane(intersectVerticalPoint, cur_plane))
-//      {
-////          glm::vec3 dir = -cur_plane.normal;
-////          glm::vec3 pos_new = cur_basketball->getPos() -
-////                  1.0f * (cur_basketball->getRadius()  - dist) * glm::normalize(dir);
-////          cur_basketball->updatePos(pos_new);
-
-////          glm::vec3 ball_vel = cur_basketball->getVel();
-////          glm::vec3 quad_vel = cur_hoopBoard.vel;
-////          float ball_mass = cur_basketball->getMass();
-////          float quad_mass = cur_hoopBoard.mass;
-////          momentumTheory(ball_mass, ball_vel, quad_mass, quad_vel, dir);
-////          float scale_v;
-////          float vel_length = glm::length(ball_vel);
-////          if(vel_length<0.5)
-////              scale_v = 0;
-////          else if(vel_length < 1.5)
-////              scale_v = 0.5;
-////          else
-////              scale_v = 0.9;
-////          ball_vel *= scale_v;
-////          cur_basketball->updateVel(ball_vel);
-//      }
-//      else
-//          return;
-//    }
-//    else
-//        return;
-
-}
-
 
 
 void GLWidget::processCollisionBall2Ball(Basketball *basketball_1, Basketball *basketball_2)
@@ -1188,262 +1010,7 @@ void  GLWidget::processCollisionBall2HoopBoard(Basketball *cur_basketball, HoopB
 
 
 
-/**
- * This method renders an arrow created via composition of glu objects
- */
-void GLWidget::renderArrow()
-{
-    // Get the time
-    float time = 5.0f * m_increment / (float) m_fps;
 
-    // Start arrow off at fired position i.e. camera position when the arrow was fired or current
-    // camera position if it hasn't been fired.
-    m_arrowPos =  glm::vec3( -m_firedXDiff, 2, -m_firedZDiff );
-    // m_arrowPos =  glm::vec3( 0.0f, -3.0f, 0.0f );
-//    std::cout << m_firedXDiff << ' ' << -m_arenaSize + m_ballHeight << ' ' << m_firedZDiff << std::endl;
-
-
-
-    // Set the velocity to reflect the rotation transforms we do to render the arrow.
-    // We keep variables for all the values we need for this to simplify the velocity vector.
-//    double cx = cos( -m_firedAngleX * M_PI / 180.0f );
-//    double sx = sin( -m_firedAngleX * M_PI / 180.0f );
-//    double cy = cos( m_firedAngleY * M_PI / 180.0f );
-//    double omcy = 1.0f - cy;
-//    double sy = sin( m_firedAngleY * M_PI / 180.0f );
-
-//    double cmx = cos( M_PI * m_firedAngleX / 180.0f );
-//    double smx = sin( M_PI * m_firedAngleX / 180.0f );
-
-
-
-    //arrowModelMat0 = glm::translate( arrowModelMat0, m_arrowPos );
-    //
-//    arrowModelMat0 = glm::scale( arrowModelMat0, glm::vec3( 0.075f ) );
-//    arrowModelMat0 = glm::translate( arrowModelMat0, m_arrowPos );
-//    arrowModelMat0 = glm::rotate( arrowModelMat0, m_firedAngleY, glm::vec3( cmx, 0.0f, smx ) );
-//    arrowModelMat0 = glm::rotate( arrowModelMat0, -m_firedAngleX, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-
-
-    //arrowModelMat0 = glm::translate( arrowModelMat0, glm::vec3( -0.5f, 0.0f, 1.0f ) );
-
-
-//    const glm::vec4 eye = glm::vec4(0.0, -m_arenaSize + m_ballHeight, 3.0, 1.0);
-//    const glm::vec4 look = glm::vec4(0.0, 0.0, -1.0, 0.0);
-//    const glm::vec4 up = glm::vec4(0.0, 1.0, 0.0, 0.0);
-//    m_camera.orientLook(eye, look, up);
-
-//    m_camera.rotateV(-m_angleX);
-//    m_camera.rotateU(-m_angleY);
-//    m_camera.translate(glm::vec4(-m_xDiff, 0.0f, -m_zDiff, 1.0f));
-
-
-    //arrowModelMat0 = m_camera.getRotation(eye, up, m_camera.degree2Radians((m_firedAngleX)));
-    //glm::vec4 new_eye = eye + glm::vec4()
-    //arrowModelMat0 = glm::translate(arrowModelMat0, glm::vec3(-m_firedXDiff, 0.0, -m_firedZDiff));
-    // Transform to get to camera coordinates to render the arrow.
-    glm::mat4 arrowModelMat0 = glm::mat4( 1.0f );
-
-
-    arrowModelMat0 = glm::translate(arrowModelMat0, m_arrowPos);
-    glm::vec4 new_eye = eye + glm::vec4(-m_firedXDiff, 0.0, -m_firedZDiff, 0.0);
-    glm::mat4 rotateX = m_camera.getRotation(new_eye, up, m_camera.degree2Radians(-m_firedAngleX));
-    arrowModelMat0 =  rotateX * arrowModelMat0;
-    glm::vec4 r_axis = rotateX * glm::vec4(1.0, 0.0, 0.0, 0.0);
-    arrowModelMat0 = m_camera.getRotation(new_eye, r_axis, m_camera.degree2Radians(-m_firedAngleY)) * arrowModelMat0;
-    arrowModelMat0 = arrowModelMat0 * m_camera.getScale(glm::vec4(0.5));
-
-    glm::vec4 new_pos = arrowModelMat0 * glm::vec4(0.0, 0.0, 0.0, 1.0);
-
-    m_arrowPos = glm::vec3(new_pos);
-
-    if ( !m_fired )
-        arrow_vel = glm::normalize(glm::transpose(glm::inverse(glm::mat3x3(arrowModelMat0))) *
-            glm::vec3(0.0, 0.0, -1));
-    else
-    {
-//        m_arrowPos += time * arrow_vel;
-        //m_arrowPos += 1 * arrow_vel;
-        //std::cout << arrow_vel.x << ' ' << arrow_vel.y << ' ' << arrow_vel.z << std::endl;
-        //arrowModelMat0 = glm::translate(arrowModelMat0, time * arrow_vel);
-        glm::vec3 cur_pos = glm::vec3(new_pos) + arrow_vel * time;
-        arrowModelMat0 = glm::translate(glm::mat4(1.0f), cur_pos);
-        arrowModelMat0 = glm::scale(arrowModelMat0, glm::vec3(0.5));
-//        arrowModelMat0 = glm::translate(glm::mat4(1.0f), m_arrowPos);
-    }
-
-
-
-    // Look for a hit, and if we find one, stop the arrow.
-    if(m_canCollide && ( (float )glm::length( ( m_arrowPos - m_targetPos ) ) < m_arrowRadius + m_targetRadius )
-            && m_timer.isActive())
-    {
-        m_scoreLabel->setText("Score: " + QString::number(++m_score));
-//        m_testLabel->setText("chouchou");
-        m_timer.stop();
-    }
-
-    //if ( m_fired )
-      //  arrowModelMat0 = glm::translate(arrowModelMat0, m_arrowPos);
-
-//    printMatrix(arrowModelMat0);
-    //arrowModelMat0 = glm::scale(arrowModelMat0, glm::vec3(0.3));
-//    printMatrix(glm::scale(glm::mat4x4(1.0), glm::vec3(0.075)));
-//    std::cout<<"-------"<<std::endl;
-
-    //std::cout << m_camera.degree2Radians((m_firedAngleX)) << std::endl;
-   // printMatrix(arrowModelMat0);
-//    arrowModelMat0 = m_camera.getRotation(3, up, -m_angleX);
-
-//    if(!m_fired)
-//    {
-//        arrowModelMat0 = glm::rotate( arrowModelMat0, 0.0f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-//    }
-    // Move and rotate to make the arrow face straight.
-//    else
-//    {
-//        arrowModelMat0 = glm::translate(arrowModelMat0,
-//                glm::vec3( qMin( 0.5f * time, 0.5f ), 0.0f, qMax( -0.7f, -1.0f * time) ) );
-//        arrowModelMat0 = glm::rotate( arrowModelMat0,
-//                qMax( 15.0f - ( time * 30 ), 0.5f ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
-//    }
-
-//    glm::mat4 arrowModelMat1 = arrowModelMat0;
-
-    // Arrowhead
-    glm::vec3 Ka = glm::vec3( 1.0f, 0.0f, 0.0f );
-    m_shader.setUniform( "Ka", Shader::VEC3, &Ka );
-    //arrowModelMat0 = glm::scale( arrowModelMat0, glm::vec3( 0.075f) );
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &arrowModelMat0[ 0 ][ 0 ] );
-    m_sphere->draw();
-
-//    // Shaft
-//    Ka = glm::vec3( 0.37f, 0.15f, 0.02f );
-//    m_shader.setUniform( "Ka", Shader::VEC3, &Ka );
-//    arrowModelMat1 = glm::translate( arrowModelMat0, glm::vec3( 0.0f, 0.0f, -0.48f ) );
-//    arrowModelMat1 = glm::scale( arrowModelMat1, glm::vec3( 0.075f, 0.075f, 0.48f ) );
-//    m_shader.setUniform( "M_Matrix", Shader::MAT4, &arrowModelMat1[ 0 ][ 0 ] );
-//    m_sphere->draw();
-
-//    // Back bit
-//    Ka = glm::vec3( 0.0f, 0.7f, 0.0f );
-//    m_shader.setUniform( "Ka", Shader::VEC3, &Ka );
-//    arrowModelMat1 = glm::translate( arrowModelMat0, glm::vec3( 0.0f, 0.0f, -0.96f ) );
-//    arrowModelMat1 = glm::scale( arrowModelMat1, glm::vec3( 0.075f ) );
-//    m_shader.setUniform( "M_Matrix", Shader::MAT4, &arrowModelMat1[0][0] );
-//    m_sphere->draw();
-}
-
-
-/**
- * Renders the bow object.
- */
-void GLWidget::renderBow()
-{
-    glm::mat4 modelMat0 = glm::mat4( 1.0f );
-
-    modelMat0 = glm::translate( modelMat0, glm::vec3( -m_xDiff, 0, -m_zDiff ) );
-    modelMat0 = glm::rotate(modelMat0, m_angleY, glm::vec3(cos(M_PI*m_angleX/180), 0.0f, sin(M_PI*m_angleX/180)));
-    modelMat0 = glm::rotate(modelMat0,-m_angleX, glm::vec3(0,1,0));
-
-    modelMat0 = glm::rotate( modelMat0, 15.0f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-    modelMat0 = glm::translate( modelMat0, glm::vec3( -0.8f, 0.5f, -2.5f ) );
-    modelMat0 = glm::scale( modelMat0, glm::vec3( 2.5f, 2.5f, 2.5f ) );
-
-    modelMat0 = glm::translate( modelMat0, glm::vec3( 0.0f, 0.0f, 1.0f ) );
-
-    // String
-    glm::vec3 Ka = glm::vec3( 0.37f, 0.15f, 0.02f);
-    glm::mat4 modelMat1 = glm::mat4( 1.0f );
-
-    // Bow
-    Ka = glm::vec3( 1.0f, 0.0f, 0.0f );
-    m_shader.setUniform( "Ka", Shader::VEC3, &Ka );
-    modelMat1 = glm::translate( modelMat0, glm::vec3( 0.0f, -0.225f, 0.21f ) );
-    modelMat1 = glm::scale( modelMat1, glm::vec3( .005f, 0.15f, .005f ) );
-    modelMat1 = glm::rotate( modelMat1, 90.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat1[0][0] );
-    m_sphere->draw();
-
-    modelMat1 = glm::translate( modelMat0, glm::vec3( 0.0f, 0.035f, 0.005f ) );
-    modelMat1 = glm::rotate( modelMat1, 30.0f, glm::vec3( 1.0f, .0f, 0.0f ) );
-    modelMat1 = glm::scale( modelMat1, glm::vec3( 0.005f, 0.005f, .25f ) );
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat1[0][0] );
-    m_sphere->draw();
-
-    modelMat1 = glm::translate( modelMat0, glm::vec3( 0.0f, -0.4825f, 0.005f ) );
-    modelMat1 = glm::rotate( modelMat1, -30.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
-    modelMat1 = glm::scale( modelMat1, glm::vec3( .005f, 0.005f, .25f ) );
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat1[0][0] );
-    m_sphere->draw();
-}
-
-
-/**
- * Renders the six walls of the room using quads.
- */
-void GLWidget::renderRoom()
-{
-    //render the walls, floor and ceiling of our playing field
-    glm::vec3 Ka = glm::vec3( 0.0f, 0.7f, 0.93f);
-    m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
-
-//    // Ceiling
-    glm::mat4 modelMat = glm::mat4(1.0f);
-    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 5.0f, 0.0f ) );
-    modelMat = glm::scale( modelMat, glm::vec3( 5.0f ) );
-    modelMat = glm::rotate(modelMat, 90.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0] );
-    m_quad->draw();
-
-//    // Back
-    modelMat = glm::mat4(1.0f);
-    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 0.0f, 5.0f ) );
-    modelMat = glm::scale( modelMat, glm::vec3( 5.0f ) );
-    modelMat = glm::rotate(modelMat, 180.0f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0] );
-    m_quad->draw();
-
-//    // Right
-    modelMat = glm::mat4(1.0f);
-    modelMat = glm::translate( modelMat, glm::vec3( 5.0f, 0.0f, 0.0f ) );
-    modelMat = glm::scale( modelMat, glm::vec3( 5.0f ) );
-    modelMat = glm::rotate(modelMat, -90.0f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
-    m_quad->draw();
-
-//    // Left
-    modelMat = glm::mat4(1.0f);
-    modelMat = glm::translate( modelMat, glm::vec3( -5.0f, 0.0f, 0.0f ) );
-    modelMat = glm::scale( modelMat, glm::vec3( 5.0f ) );
-    modelMat = glm::rotate(modelMat, 90.0f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
-    m_quad->draw();
-
-//    // Front
-    glActiveTexture(GL_TEXTURE0); // Set the active texture to texture 0.
-    m_shader.setUniform("textureSampler", Shader::INT, 0);
-
-    Ka = glm::vec3(0.9f, 0.74f, 0.2f);
-    m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
-    modelMat = glm::mat4(1.0f);
-    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 0.0f, -5.0f ) );
-    modelMat = glm::scale( modelMat, glm::vec3( 5.0f ) );
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
-    glBindTexture(GL_TEXTURE_2D, m_textureId);
-    m_quad->draw();
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-//    // Ground
-    Ka = glm::vec3(0.3f, 0.74f, 0.2f);
-    m_shader.setUniform( "Ka", Shader::VEC3, &Ka[0] );
-    modelMat = glm::mat4(1.0f);
-    modelMat = glm::translate( modelMat, glm::vec3( 0.0f, 0.0f, 0.0f ) );
-    modelMat = glm::scale( modelMat, glm::vec3( 5.0f ) );
-    modelMat = glm::rotate(modelMat, -90.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
-    m_shader.setUniform( "M_Matrix", Shader::MAT4, &modelMat[0][0]);
-    m_quad->draw();
-}
 
 
 /**
@@ -1464,8 +1031,7 @@ void GLWidget::resizeGL(int width, int height)
  */
 void GLWidget::updateCamera()
 {
-    float w = width();
-    float h = height();
+
 //    float aspectRatio = 1.0f * w / h;
 //    m_projectionMatrix = glm::mat4(1.0);
 //    m_projectionMatrix = glm::perspective( m_camera.fovy, aspectRatio, m_camera.near, m_camera.far );
@@ -1553,28 +1119,6 @@ void GLWidget::keyPressEvent ( QKeyEvent * event )
     }
 }
 
-
-void GLWidget::keyReleaseEvent ( QKeyEvent * event ){
-//    if ( !event->isAutoRepeat() && event->key() == Qt::Key_Space){
-//        std::cout << "space release!" << std::endl;
-//        m_powerSlot->setValue(m_power);
-//        Basketball *cur_b = m_basketballList[m_basketballList.size() - 1];
-//        cur_b->fireBasketball();
-//        initBasketball();
-//        m_power = 0;
-//        update();
-//    }
-
-
-//    if (event->key() == Qt::Key_Space)
-//    {
-//        if(event->isAutoRepeat())
-//            std::cout << "autorepeat!" << std::endl;
-////        else
-////            std::cout << "release!" << std::endl;
-//    }
-
-}
 
 
 /**
@@ -1693,11 +1237,7 @@ void GLWidget::setProgressBar(QProgressBar *pBar)
 /**
  * Sets the position of the target, and notifies the system that we are ready to attempt collisions
  */
-void GLWidget::setTargetPosition(glm::vec3 pos)
-{
-    m_canCollide = true;
-    m_targetPos = pos;
-}
+
 
 
 /**

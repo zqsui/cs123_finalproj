@@ -47,7 +47,7 @@ protected:
     void keyPressEvent ( QKeyEvent * event );
     void mouseMoveEvent ( QMouseEvent * event );
     void mousePressEvent ( QMouseEvent * event );
-    void keyReleaseEvent ( QKeyEvent * event );
+
 
 protected slots:
     void tick();
@@ -55,8 +55,8 @@ protected slots:
 private:
     // Initialization methods.
     void initShapes();
-    void initTarget();
-    void initSphere();
+
+
 
     void initBasketball();
     void initWall();
@@ -64,13 +64,8 @@ private:
     void initBasketballStand();
 
     // Rendering methods.
-    void renderArrowSphere();
-    void renderTarget();
-    void renderTargetSphere();
-    void renderRoom();
-    void renderArrow();
-    void renderBow();
-    void renderQuad();
+
+
     void renderWall();
     void renderHoop();
     void renderStand();
@@ -80,25 +75,12 @@ private:
     void processCollisionBall2Wall(Basketball *cur_basketball, Wall cur_wall);
     void processCollisionBall2HoopBoard(Basketball *cur_basketball, HoopBoard cur_hoopBoard);
     void processScoring(Basketball *cur_basketball);
-    void processCollisionBall2Plane(Basketball *cur_basketball, Plane cur_plane);
+
     void renderBasketball();
 
 
 
-    void setTargetPosition(glm::vec3 pos);
-    glm::vec3 getTargetPosition() { return m_targetPos; }
-    glm::vec3 getArrowPosition() { return m_arrowPos; }
 
-    float getTargetRadius() { return m_targetRadius; }
-    float getArrowRadius() { return m_arrowRadius; }
-
-    // This vector automatically contains the arrow's position x,y,z coordinates.
-    glm::vec3 m_arrowPos;
-    float m_arrowRadius;
-
-    // This vector is initialized to 0,0,0.
-    glm::vec3 m_targetPos;
-    float m_targetRadius;
 
     Shader m_shader;
     Quad* m_quad;
@@ -128,7 +110,7 @@ private:
     QProgressBar * m_powerSlot;
 
     int m_power;
-    bool m_canCollide;
+
     int m_n_all;
     float m_wallsize;
     float m_hoopsize;
