@@ -27,6 +27,7 @@ Quad::Quad(Shader &shader)
        0, 0, 1,
        0, 1,
        rad, rad, 0,
+       0, 0, 1,
        0, 0
    };
 

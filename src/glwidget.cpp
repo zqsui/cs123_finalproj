@@ -204,7 +204,7 @@ void GLWidget::initHoop(){
     tmpPlane.b = 1.0;
     tmpPlane.c = -0.05;
     tmpPlane.centroid = torus_center + glm::vec3(0.0, pipe_radius, 0.5f*m_hoopsize - pipe_radius);
-    printVec3(tmpPlane.centroid);
+
     tmpPlane.d = -glm::dot(tmpPlane.centroid, glm::vec3(tmpPlane.a, tmpPlane.b, tmpPlane.c));
     tmpPlane.width = width;
     tmpPlane.height = height;
