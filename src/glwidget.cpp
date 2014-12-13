@@ -595,7 +595,10 @@ void GLWidget::renderWall()
 
     }
     glUniform1i(m_shader.uniformLocation("isBumpMapping"), 0);
-glBindTexture(GL_TEXTURE_2D, 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void GLWidget::renderHoop()
