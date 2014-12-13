@@ -44,6 +44,7 @@ GLWidget::GLWidget(QWidget *parent)
     m_targetPos = m_arrowPos;
 
     m_power = 1;
+    m_firstPersonMode = false;
 
 }
 
@@ -59,6 +60,7 @@ GLWidget::~GLWidget()
     delete m_quad;
     delete m_sphere;
     delete m_torus;
+    delete m_cylinder;
 }
 
 
