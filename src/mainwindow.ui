@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>[Lab02] 3D Transformations</string>
+   <string>Basketball Shooting Game</string>
   </property>
   <widget class="GLWidget" name="centralWidget">
    <property name="focusPolicy">
